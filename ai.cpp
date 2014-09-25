@@ -1,7 +1,9 @@
 #include "ai.h"
+#include <map>
 // #include <algorithm>
 
 using std::list;
+using std::map;
 
 size_t hash_value(const Board &board)
 {
@@ -69,10 +71,9 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
       info.x = bs.x;
       info.y = bs.y;
       info.score = bs.score;
-      std::cout << "Hash hit!" << std::endl;
+      // std::cout << "Hash hit!" << std::endl;
       return info;
     }
-    // std::cout << "Hash not hit." << std::endl;
   }
   
   //リーフなら評価値を返す
@@ -82,13 +83,13 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
     return info;
   }
 
-  list<std::pair<int, int> > availPos;
+  list<pair<int, int> > availPos;
   
   // List up all places where you can put a stone
   for(list<std::pair<int, int> >::const_iterator itr = begin(board.getCl()); 
       itr != end(board.getCl()); itr++){
     if(board.canPut(itr->first, itr->second)){
-      availPos.push_back(*itr);
+      availPos.push_back(*itr);      
     }
   }
   
@@ -133,39 +134,54 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
   // 浅い探索によるmove ordering
   // ただし深さが小さい(具体的には2以下)ときは行わない
   // ただし反復深化によるmove orderingが優先
-  // if(pcx != 0 && pcy != 0){
-  //   // 反復深化によるmove ordering
-  //   // 反復深化の結果、長兄ノードがPVノードならば何もしない
-  //   if(pcx != availPos.front().first || pcy != availPos.front().second){
-  //     for(list<std::pair<int, int> >::iterator itr = next(begin(availPos));
-  // 	  itr != end(availPos); itr++){
-  // 	// PVノードと長兄ノードを入れ替える
-  // 	if(pcx == itr->first && pcy == itr->second){
-  // 	  iter_swap(availPos.begin(), itr);
-  // 	  break;
-  // 	}
-  //     }
-  //   }
-  // }else if(depth >= 3){  // is_orderingは不要ｗｗ
-  //   MoveInfo tmpInfo;
-  //   // ここは tmpInfo.score *= -1 してはいけない！
-  //   // tmpInfo = negascout(board, turn, alpha, beta, 1);
-  //   tmpInfo = negascout(board, alpha, beta, 1);
-  //   // 浅い探索の結果、長兄ノードがPVノードならば何もしない
-  //   if(tmpInfo.x != availPos.front().first
-  //      || tmpInfo.y != availPos.front().second){
-  //     // 次兄ノード以降を調べる
-  //     for(list<std::pair<int, int> >::iterator itr = next(begin(availPos));
-  // 	  itr != end(availPos); itr++){
-  // 	// PVノードと長兄ノードを入れ替える
-  // 	// 本当はソートすべきだけど、恐らく面倒なのだろう
-  // 	if(tmpInfo.x == itr->first && tmpInfo.y == itr->second){
-  // 	  iter_swap(availPos.begin(), itr);
-  // 	  break;
-  // 	}
-  //     } 
-  //   }
-  // }
+  // if(false){
+  if(depth >= THRESH_MOVE_ORDERING_DEPTH){  
+    BitBoard revPattern;
+    MoveInfo moInfo;
+    map<int, pair<int, int> > moveScore;
+    for(list<pair<int, int> >::iterator i = begin(availPos);
+	i != end(availPos); i++){
+      revPattern = board.putStone(i->first, i->second);
+      assert(revPattern != 0);
+      // 浅い探索
+      moInfo = negascout(board, -beta, -alpha, 1);
+      /*
+	ここではscoreに-1をかけない。
+	後でmapのキーでソートを行うが、
+	このとき自動的に昇順ソートになるため、
+	あえて大小関係を逆にしておいた方がよいのである。
+      */
+      board.undo(i->first, i->second, revPattern);
+      moveScore[moInfo.score] = *i;
+      // cout << i->first << ", " << i->second << endl;
+    }
+    
+    availPos.clear();
+    for(map<int, pair<int, int> >::iterator i = begin(moveScore);
+	i != end(moveScore); i++){
+      availPos.push_back(i->second);
+      // cout << i->first << ": " << i->second.first+1 << ", "
+      // 	   << i->second.second+1 << endl;
+    }
+    
+    // MoveInfo tmpInfo;
+    // // ここは tmpInfo.score *= -1 してはいけない！
+    // tmpInfo = negascout(board, alpha, beta, 1);
+    // // 浅い探索の結果、長兄ノードがPVノードならば何もしない
+    // if(tmpInfo.x != availPos.front().first
+    //    || tmpInfo.y != availPos.front().second){
+    //   // 次兄ノード以降を調べる
+    //   for(list<std::pair<int, int> >::iterator itr = next(begin(availPos));
+    // 	  itr != end(availPos); itr++){
+    // 	// PVノードと長兄ノードを入れ替える
+    // 	// 本当はソートすべきだけど、恐らく面倒なのだろう
+    // 	if(tmpInfo.x == itr->first && tmpInfo.y == itr->second){
+    // 	  iter_swap(availPos.begin(), itr);
+    // 	  break;
+    // 	}
+    //   } 
+    // }
+  }
   
   // first child
   // Put a stone on the first child node.

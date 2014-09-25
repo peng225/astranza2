@@ -23,6 +23,9 @@ const int INF = INT_MAX;
 const int DEFAULT_SEARCH_TIME = 1;
 const int MAX_VALUE = 5000;
 /* const double SCALE = 1.5; */
+
+const int THRESH_MOVE_ORDERING_DEPTH = 4;
+
 //ProbCutのマージン
 /* const double MARGIN3 = 7.47179 * SCALE; */
 /* const double MARGIN4 = 6.13008 * SCALE; */
