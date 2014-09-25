@@ -87,6 +87,5 @@ void fight(Board &board, AI &ai, std::istream &ist)
   while(!board.isEnd()){
     search(board, ai, depth, h);
   }
-  printWinner(board);
 }
 

@@ -65,6 +65,14 @@ class Board
     return tesuu;
   };
   void changeTurn();
+  BitBoard getBlack() const
+  {
+    return black;
+  }
+  BitBoard getWhite() const
+  {
+    return white;
+  }
   bool operator==(const Board &obj) const;
  private:
   BitBoard black;

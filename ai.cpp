@@ -3,18 +3,15 @@
 
 using std::list;
 
-// size_t hash_value(const Board& ban)
-// {
-//   // 複数の値のハッシュ値を組み合わせてハッシュ値を計算するには、
-//   // boost::hash_combine を使います。
-//   size_t h = 0;
-//   for(int i = 1; i < BAN_SIZE - 1; i++){
-//     for(int j = 1; j < BAN_SIZE - 1; j++){
-//       boost::hash_combine(h, ban.get_ban(i, j));
-//     }
-//   }
-//   return h;
-// }
+size_t hash_value(const Board &board)
+{
+  // 複数の値のハッシュ値を組み合わせてハッシュ値を計算するには、
+  // boost::hash_combine を使います。
+  size_t h = 0;
+  boost::hash_combine(h, board.getBlack());
+  boost::hash_combine(h, board.getWhite());
+  return h;
+}
 
 //private member of Search
 //末端評価
@@ -49,9 +46,9 @@ MoveInfo AI::eval(const Board &board)
   探索時にパスをどのように検出するかが問題となる。
   どうしよう。
 */
-MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth,
-		       bool isOrdering, bool isProb,
-		       int pcx, int pcy)
+MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
+		       // bool isOrdering, bool isProb,
+		       // int pcx, int pcy)
 {
   MoveInfo info;      
 
@@ -65,24 +62,18 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth,
 
   numSearchNode++;
 
-  /*
-    is_orderingがtrueのときというのは
-    1.反復深化したくないとき
-    2.ルートノードではないとき
-    のどちらかであり、ハッシュを用いたいときというのは
-    反復深化がしたいルートノードなので、これでよい
-  */
-  // if(!is_ordering && hs.find(*ban.get()) != hs.end()){
-  //   Hash_Value hv = hs[board];
-  //   if(hv.depth >= depth && hv.turn == turn){
-  //     info.x = hv.x;
-  //     info.y = hv.y;
-  //     info.value = hv.value;
-  //     std::cout << "Hash hit!" << std::endl;
-  //     return info;
-  //   }
-  // }
-  // std::cout << "Hash not hit." << std::endl;
+  // ハッシュにヒットしてたらそこで探索おしまい
+  if(bh.find(board) != end(bh)){
+    BoardState bs = bh.at(board);
+    if(bs.depth >= depth && bs.turn == board.getTurn()){
+      info.x = bs.x;
+      info.y = bs.y;
+      info.score = bs.score;
+      std::cout << "Hash hit!" << std::endl;
+      return info;
+    }
+    // std::cout << "Hash not hit." << std::endl;
+  }
   
   //リーフなら評価値を返す
   assert(depth >= 0);
@@ -246,20 +237,21 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth,
   //枝刈りされなかったときはここに来るのでよいのだが、
   //全ての子ノードの探索結果がα値を下回っていたときにもここに来るよなぁ
   //どっちにしても返すのは変数maxScoreの値なので、問題ないかな
-  // if(depth < 5 || (double)((int)clock() - st.start) / (double)CLOCKS_PER_SEC >= st.search_time){
-  //   ; //Do nothing
-  //   //ちょっとしょぼいけどとりあえずこれで
-  // }else if(hs.find(*ban.get()) == hs.end()){
-  //   Hash_Value thv(turn, depth, v.x, v.y, v.value);
-  //   hs[*ban.get()] = thv;
-  // }else if(hs[*ban.get()].depth < depth){
-  //   //登録済のものよりdepthが大きければ更新
-  //   hs[*ban.get()].turn = turn;
-  //   hs[*ban.get()].depth = depth;
-  //   hs[*ban.get()].x = v.x;
-  //   hs[*ban.get()].y = v.y;
-  //   hs[*ban.get()].value = v.value;
-  // }
+  if(depth < 5 ||
+     (double)((int)clock() - st.start) /
+     (double)CLOCKS_PER_SEC >= st.searchTime){
+    ; //Do nothing
+  }else if(bh.find(board) == bh.end()){
+    BoardState tbs(board.getTurn(), depth, info.x, info.y, info.score);
+    bh[board] = tbs;
+  }else if(bh.at(board).depth < depth){
+    //登録済のものよりdepthが大きければ更新
+    bh.at(board).turn = board.getTurn();
+    bh.at(board).depth = depth;
+    bh.at(board).x = info.x;
+    bh.at(board).y = info.y;
+    bh.at(board).score = info.score;
+  }
   return info;
 }
 
@@ -286,8 +278,8 @@ void AI::search(Board &board, int depth, bool is_itr)
 	// 前の深さでの探索の結果をmove orderingに利用
 	// newInfo = negascout(board, turn, -INF, INF, i,
 	// 		   false, false, info.x, info.y);
-	newInfo = negascout(board, -INF, INF, i,
-			    false, false, info.x, info.y);
+	newInfo = negascout(board, -INF, INF, i);
+			    // false, false, info.x, info.y);
       }else{
 	// 25手目未満かつ定石が使えればreturn
 	// 定石が使えるのに反復深化しても意味ないよね
@@ -309,10 +301,11 @@ void AI::search(Board &board, int depth, bool is_itr)
       // 25手目以上ならば探索をする
       // 定石が使えなければ探索をする
       int tmpSt = st.searchTime;
-      st.searchTime = 1000000;
+      st.searchTime = INF;
       // 恐らくこれが使いたいときはProbCutはしたくない
       // info = negascout(board, turn, -INF, INF, depth, true, false);
-      info = negascout(board, -INF, INF, depth, true, false);
+      info = negascout(board, -INF, INF, depth);
+		       // , true, false);
       st.searchTime = tmpSt;
     }else{
       // 25手目未満かつ定石が使えればreturn
@@ -320,7 +313,8 @@ void AI::search(Board &board, int depth, bool is_itr)
     }
   }
   // 結果が確定していないnewInfoを使ってはいけない
-  std::cout << "x , y, score = " << info.x << ", " << info.y << ", " << info.score << std::endl;
+  std::cout << "x , y, score = " << info.x << ", " << info.y << ", "
+	    << info.score << std::endl;
   board.putStone(info.x, info.y);
   return;
 }

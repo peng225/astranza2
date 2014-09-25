@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
       board.init();
       hist.clear();
       board.display();
+      ai.clearHash();
     }
     else if(command == "put" || command == "p"){
       put(board, hist, *ist);

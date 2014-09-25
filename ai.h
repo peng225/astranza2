@@ -12,8 +12,8 @@
 #include "jouseki.h"
 #include "pattern.h"
 
-/* struct Hash_Value; */
-/* typedef boost::unordered_map<Ban, Hash_Value> u_map; */
+struct BoardState;
+typedef boost::unordered_map<Board, BoardState> BoardHash;
 
 using std::begin;
 using std::end;
@@ -61,25 +61,24 @@ struct SearchTime
 SearchTime() : start(0), searchTime(DEFAULT_SEARCH_TIME){}
 };
 
-/** When you use the hash, the type of the stored data
- *  is this structure. 
- */
-/* struct Hash_Value */
-/* { */
-/* public: */
-/*   int turn;  //その盤面での手番 */
-/*   int depth;  //その盤面に辿り着いた時の残り探索深さ */
-/*   int x, y; */
-/*   double value;  //その盤面の評価値 */
-/* Hash_Value() : turn(0), depth(-1), x(0), y(0), value(0){} */
-/*   Hash_Value(int turn, int depth, int x, int y, double value){ */
-/*     this->turn = turn; */
-/*     this->depth = depth; */
-/*     this->x = x; */
-/*     this->y = y; */
-/*     this->value = value; */
-/*   } */
-/* }; */
+/* When you use the hash, the type of the stored data */
+/*  is this structure.  */
+struct BoardState
+{
+public:
+  int turn;  //その盤面での手番
+  int depth;  //その盤面に辿り着いた時の残り探索深さ
+  int x, y;
+  int score;  //その盤面の評価値
+BoardState() : turn(0), depth(-1), x(0), y(0), score(0){}
+  BoardState(int turn, int depth, int x, int y, int score){
+    this->turn = turn;
+    this->depth = depth;
+    this->x = x;
+    this->y = y;
+    this->score = score;
+  }
+};
 
 /** This class provides the funtction to 
  * search the game tree.
@@ -89,11 +88,15 @@ class AI
  public:
   /** Read the jouseki data and store it to the variable "jouseki". */
   AI();
-  /* u_map& get_hs(){return hs;} */
-  /* Pattern& get_pt(){return pt;} */
-  /* Jouseki& get_jouseki(){return jouseki;} */
-  /* Time& get_time(){return st;} */
-  void setTime(double val){st.searchTime = val;}
+  void setTime(double val)
+  {
+    st.searchTime = val;
+  }
+  void clearHash()
+  {
+    bh.clear();
+  }
+    
   /** This function searches the game tree.
    * If "is_ordering" is true, you search the child node preferentially 
    * which seems to return the best value as a result of the shallow search. 
@@ -106,9 +109,9 @@ class AI
    * the child node which you can get by putting a stone on "pcx", "pcy".
    * This is available when "is_ordering" is false.
    */
-  MoveInfo negascout(Board &board, int alpha, int beta, int depth,
-		     bool isOrdering = true, bool isProb = true,
-		     int pcx = 0, int pcy = 0);
+  MoveInfo negascout(Board &board, int alpha, int beta, int depth);
+		     /* bool isOrdering = true, bool isProb = true, */
+		     /* int pcx = 0, int pcy = 0); */
   //MoveInfo sc_jamboree(const spBan ban, int turn, int alpha, int beta, int depth, bool is_root = false);
   /** This function is intended to be used in actual game play.
    * If "is_itr" is true, the iteretive deepning algorithm runs.
@@ -124,7 +127,7 @@ class AI
   Jouseki jouseki;
   Pattern pt;
   SearchTime st;
-  /* u_map hs; */
+  BoardHash bh;
   int numSearchNode;
 };
 
