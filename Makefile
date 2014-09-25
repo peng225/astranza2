@@ -1,17 +1,34 @@
 #Makefile
 
-CFLAGS = -c -O3 -Wall
-FINAL_CFLAGS = -O3 -Wall
+# CFLAGS = -c -g -O3 -Wall -std=c++0x
+# FINAL_CFLAGS = -g -O3 -Wall -std=c++0x
+CFLAGS = -c -g -O0 -Wall -std=c++0x
+FINAL_CFLAGS = -g -O0 -Wall -std=c++0x
 BINARY = astranza2
-OBJS = board.o
+OBJS = board.o jouseki.o pattern.o ai.o history.o menu.o
 COMPILE = g++ $(CFLAGS)
 
 all: $(BINARY)
 
 $(BINARY): main.cpp $(OBJS)
-	g++ $(FINAL_CFLAGS) main.cpp $(OBJS) -o $(BINARY)
+	g++ $(FINAL_CFLAGS) main.cpp $(OBJS) -o $(BINARY) -lreadline
 
 board.o: board.cpp
+	$(COMPILE) $<
+
+jouseki.o: jouseki.cpp
+	$(COMPILE) $<
+
+pattern.o: pattern.cpp
+	$(COMPILE) $<
+
+ai.o: ai.cpp
+	$(COMPILE) $<
+
+history.o: history.cpp
+	$(COMPILE) $<
+
+menu.o: menu.cpp
 	$(COMPILE) $<
 
 board.o: board.h

@@ -1,0 +1,109 @@
+#include <string>
+#include <fstream>
+#include <sstream>
+#include "jouseki.h"
+#include "random.h"
+#include "pattern.h"
+
+//public member of class Jouseki
+void Jouseki::readJousekiFile(string filename)
+{
+  std::ifstream ifs(filename.c_str());
+  std::string line;
+  std::list<std::pair<int, int> > moveList[NUM_SYMMETRY]; //対称性を処理するため
+  while(getline(ifs, line)){
+    if(line[0] == '#'){
+      continue;
+    }
+    if(line.empty()){
+      for(int i = 0; i < NUM_SYMMETRY; i++){
+	if(!moveList[i].empty()){
+	  jousekiList.push_back(moveList[i]);
+	}
+      }
+      for(int i = 0; i < NUM_SYMMETRY; i++){
+	moveList[i].clear();
+      }
+      continue;
+    }
+    
+    int tx, ty;
+    std::stringstream buf(line);
+    buf >> tx >> ty;
+    assert(tx != 0);
+    if(tx == 0) break;
+
+    // 人間視点の座標をコンピュータ視点に変換
+    tx--;
+    ty--;
+    
+    std::pair<int, int> coord(tx, ty);
+    //std::cout << p.first << "," << p.second << std::endl;
+    moveList[0].push_back(coord);
+    tx = coord.first;
+    ty = coord.second;
+    coord.first = ty;
+    coord.second = tx;
+    //std::cout << p.first << "," << p.second << std::endl;
+    moveList[1].push_back(coord);
+    tx = coord.first;
+    ty = coord.second;
+    coord.first = BOARD_SIZE - 1 - tx;
+    coord.second = BOARD_SIZE - 1 - ty;
+    //std::cout << p.first << "," << p.second << std::endl;
+    moveList[2].push_back(coord);
+    tx = coord.first;
+    ty = coord.second;
+    coord.first = ty;
+    coord.second = tx;
+    //std::cout << p.first << "," << p.second << std::endl;
+    moveList[3].push_back(coord);
+  }
+  ifs.close();
+
+  // for(vector<list<pair<int, int> > >::iterator i = begin(jousekiList);
+  //     i != end(jousekiList); i++){
+  //   for(list<pair<int, int> >::iterator j = begin(*i);
+  // 	j != end(*i); j++){
+  //     cout << j->first+1 << ", " << j->second+1 << endl;
+  //   }
+  //   cout << endl;
+  // }
+
+  //randomize
+  randJousekiList();
+}
+
+bool Jouseki::useJouseki(Board &board)
+{
+  for(vector<list<pair<int, int> > >::iterator i = begin(jousekiList);
+      i != end(jousekiList); i++){
+    if((int)i->size() < board.getTesuu()) continue;
+    int count = 0;
+    Board tmpBoard;
+    // 現在の手数の手前まで移動
+    for(std::list<std::pair<int, int> >::iterator j = begin(*i);
+	count < board.getTesuu() - 1; j++){
+      tmpBoard.putStone(j->first, j->second);
+      count++;
+    }
+    // 定石ファイルに同じ盤面が存在すれば使う
+    if(board == tmpBoard){
+      std::cout << "jouseki x, y = ";
+      std::list<std::pair<int, int> >::iterator itr = begin(*i);
+      for(int j = 0; j < count; j++){
+	itr++;
+      }
+      board.putStone(itr->first, itr->second);
+      std::cout << itr->first << ", " << itr->second << std::endl;
+      return true;
+    }
+  }
+  return false;
+}
+
+void Jouseki::randJousekiList()
+{
+  Random rnd;
+  random_shuffle(jousekiList.begin(), jousekiList.end(), rnd);
+}
