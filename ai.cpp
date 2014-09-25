@@ -23,10 +23,10 @@ MoveInfo AI::eval(const Board &board)
   MoveInfo info;
   //勝敗が決まっていたら、max or minの評価値を返す
   if(board.isEnd()){
-    int dec = board.isWin();
-    if(dec == 1){
+    State_t winner = board.getWinner();
+    if(winner == board.getTurn()){
       info.score = MAX_VALUE + pt.evalFeature(board);
-    }else if(dec == 0){
+    }else if(winner == SPACE){
       info.score = 0;
     }else{
       info.score = -MAX_VALUE + pt.evalFeature(board);

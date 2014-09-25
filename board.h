@@ -51,7 +51,7 @@ class Board
    * else if draw, return 0.
    * else return -1.
    */
-  int isWin() const;
+  State_t getWinner() const;
   /** Check if the player whose turn is "turn" must pass or not. */
   bool isPass() const;
   std::list<std::pair<int, int> >& getCl(){return candList;}

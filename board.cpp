@@ -285,23 +285,22 @@ bool Board::isEnd() const
   return true;
 }
 
-int Board::isWin() const
+State_t Board::getWinner() const
 {
-  int me = 0;
-  int op = 0;
-  State_t oppTurn = (turn == BLACK ? WHITE : BLACK);
+  int blackCount = 0;
+  int whiteCount = 0;
   for(int i = 0; i < BOARD_SIZE; i++){
     for(int j = 0; j < BOARD_SIZE; j++){
-      if(getState(i, j) == turn){
-	me++;
-      }else if(getState(i, j) == oppTurn){
-	op++;
+      if(getState(i, j) == BLACK){
+	blackCount++;
+      }else if(getState(i, j) == WHITE){
+	whiteCount++;
       }
     }
   }
-  if(me > op) return 1;
-  else if(me == op) return 0;
-  else return -1;
+  if(blackCount > whiteCount) return BLACK;
+  else if(blackCount == whiteCount) return SPACE;
+  else return WHITE;
 }
 
 bool Board::isPass() const

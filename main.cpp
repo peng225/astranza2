@@ -39,11 +39,19 @@ int main(int argc, char *argv[])
     if(command == "fight" || command == "f"){
       fight(board, ai, *ist);
     }
-    // else if(command == "set_depth" || command == "sd") set_depth(*ist);
+    else if(command == "setDepth" || command == "sd"){
+      (*ist) >> depth;
+      cout << "Depth was changed to " << depth << "." << endl;
+    }
     else if(command == "search" || command == "s"){
       search(board, ai, depth, hist);
     }
-    // else if(command == "set_time" || command == "st") set_time(*ist);
+    else if(command == "setTime" || command == "st"){
+      int time;
+      (*ist) >> time;
+      ai.setTime(time);
+      cout << "Search time was changed to " << time << "." << endl;
+    }
     // else if(command == "learn" || command == "l") learn(*ist);
     // else if(command == "generate" || command == "g") gen_kifu(*ist);
     else if(command == "init" || command == "i"){

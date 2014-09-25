@@ -1,5 +1,11 @@
 #include "menu.h"
 
+void printWinner(const Board &board)
+{
+  State_t winner = board.getWinner();
+  cout << (winner == BLACK ? "BLACK" : "WHITE") << " won." << endl;
+}
+
 void put(Board &board, list<History> &hist, std::istream &ist){
   // history
   hist.push_back(History(board));
@@ -32,6 +38,11 @@ void put(Board &board, list<History> &hist, std::istream &ist){
       cout << (board.getTurn() == BLACK ? "BLACK" : "WHITE") << " PASS" << endl;
       board.changeTurn();
     }
+
+    // 終了処理
+    if(board.isEnd()){
+      printWinner(board);
+    }
   }
 
   
@@ -59,6 +70,11 @@ void search(Board &board, AI &ai, int depth, list<History> &hist)
       cout << (board.getTurn() == BLACK ? "BLACK" : "WHITE") << " PASS" << endl;
       board.changeTurn();
     }
+    
+    // 終了処理
+    if(board.isEnd()){
+      printWinner(board);
+    }
   }
 }
 
@@ -71,4 +87,6 @@ void fight(Board &board, AI &ai, std::istream &ist)
   while(!board.isEnd()){
     search(board, ai, depth, h);
   }
+  printWinner(board);
 }
+
