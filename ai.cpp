@@ -130,11 +130,11 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
   //   }
   //   //std::cout << "no prob" << std::endl;
   // }
+  
 
   // 浅い探索によるmove ordering
   // ただし深さが小さい(具体的には2以下)ときは行わない
   // ただし反復深化によるmove orderingが優先
-  // if(false){
   if(depth >= THRESH_MOVE_ORDERING_DEPTH){  
     BitBoard revPattern;
     MoveInfo moInfo;
@@ -163,36 +163,15 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
       // cout << i->first << ": " << i->second.first+1 << ", "
       // 	   << i->second.second+1 << endl;
     }
-    
-    // MoveInfo tmpInfo;
-    // // ここは tmpInfo.score *= -1 してはいけない！
-    // tmpInfo = negascout(board, alpha, beta, 1);
-    // // 浅い探索の結果、長兄ノードがPVノードならば何もしない
-    // if(tmpInfo.x != availPos.front().first
-    //    || tmpInfo.y != availPos.front().second){
-    //   // 次兄ノード以降を調べる
-    //   for(list<std::pair<int, int> >::iterator itr = next(begin(availPos));
-    // 	  itr != end(availPos); itr++){
-    // 	// PVノードと長兄ノードを入れ替える
-    // 	// 本当はソートすべきだけど、恐らく面倒なのだろう
-    // 	if(tmpInfo.x == itr->first && tmpInfo.y == itr->second){
-    // 	  iter_swap(availPos.begin(), itr);
-    // 	  break;
-    // 	}
-    //   } 
-    // }
-  }
+  }  
   
   // first child
   // Put a stone on the first child node.
   BitBoard revPattern;
-  // board.display();
-  // cout << "turn: " << (board.getTurn() == BLACK ? "BLACK" : "WHITE") << endl;
-  // cout << availPos.front().first+1 << ", " << availPos.front().second+1 << endl;
+
   revPattern = board.putStone(availPos.front().first,
 			      availPos.front().second);
   assert(revPattern != 0);
-
   info = negascout(board, -beta, -alpha, depth - 1);
   info.score *= -1;
   /*
@@ -220,30 +199,57 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
   tmpBoard = info.board;
   tx = availPos.front().first;
   ty = availPos.front().second;
+
   
-  for(list<pair<int, int> >::iterator itr = next(begin(availPos));
+  for(list<pair<int, int> >::const_iterator itr = next(begin(availPos));
       itr != end(availPos); itr++){
-    // Put a stone on the child node.
+    // // Put a stone on the child node.
+    // revPattern = board.putStone(itr->first, itr->second);
+    // assert(revPattern != 0);
+    // info = negascout(board, -beta, -alpha, depth - 1);
+    // info.score *= -1;
+    // board.undo(itr->first, itr->second, revPattern);
+
+    
+
+    // Null Window Search
     revPattern = board.putStone(itr->first, itr->second);
     assert(revPattern != 0);
-    info = negascout(board, -beta, -alpha, depth - 1);
-    info.score *= -1;
-    board.undo(itr->first, itr->second, revPattern);
+
+    info = negascout(board, -alpha - 1, -alpha, depth - 1);
+    info.score *= -1;    
     
-    if(info.score >= beta){
+    if(beta <= info.score){
+      board.undo(itr->first, itr->second, revPattern);
       info.x = 0;
       info.y = 0;
+      // cout << "null beta cut" << endl;
       return info;
     }else if(alpha < info.score){
       alpha = info.score;
+      info = negascout(board, -beta, -alpha, depth - 1);
+      info.score *= -1;
+      if(beta <= info.score){
+	// cout << "real beta cut" << endl;
+	board.undo(itr->first, itr->second, revPattern);
+	info.x = 0;
+	info.y = 0;
+	return info;
+      }else if(alpha < info.score){
+	alpha = info.score;
+      }
     }
-    if(maxScore < info.score){
+    if(maxScore < info.score){      
       maxScore = info.score;
       tx = itr->first;
       ty = itr->second;
       tmpBoard = info.board;
     }
+
+    board.undo(itr->first, itr->second, revPattern);
   }
+
+  
   info.x = tx;
   info.y = ty;
   info.score = maxScore;
