@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
     ai.setTime(INF);
     for(int i = 0; i < loopNum; i++){
-      ai.search(board, 6);
+      ai.search(board, 8);
     }
     return 0;
   }
