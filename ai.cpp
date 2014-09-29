@@ -223,12 +223,14 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
       board.undo(itr->first, itr->second, revPattern);
       info.x = 0;
       info.y = 0;
+      // cout << "null beta cut" << endl;
       return info;
     }else if(alpha < info.score){
       alpha = info.score;
       info = negascout(board, -beta, -alpha, depth - 1);
       info.score *= -1;
       if(beta <= info.score){
+	// cout << "real beta cut" << endl;
 	board.undo(itr->first, itr->second, revPattern);
 	info.x = 0;
 	info.y = 0;
