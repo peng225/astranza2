@@ -69,10 +69,13 @@ int main(int argc, char *argv[])
     if(command == "fight" || command == "f"){
       fight(board, ai, *ist);
     }
+    else if(command == "undo" || command == "u"){
+      undo(board, hist);
+    }
     else if(command == "setDepth" || command == "sd"){
       (*ist) >> depth;
       cout << "Depth was changed to " << depth << "." << endl;
-    }
+    }    
     else if(command == "search" || command == "s"){
       search(board, ai, depth, hist);
     }

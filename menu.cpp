@@ -89,3 +89,18 @@ void fight(Board &board, AI &ai, std::istream &ist)
   }
 }
 
+void undo(Board &board, list<History> &hist)
+{
+  if(hist.size() != 0){
+    hist.back().recover(board);
+    hist.pop_back();
+    board.display();
+    if(board.getTurn() == BLACK){
+      std::cout << "Turn:BLACK" << std::endl;
+    }else{
+      std::cout << "Turn:WHITE" << std::endl;
+    }
+  }else{
+    cout << "No history exists." << endl;
+  }
+}
