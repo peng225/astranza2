@@ -3,11 +3,11 @@
 # CFLAGS = -c -g -O3 -Wall -std=c++0x -DNDEBUG
 # FINAL_CFLAGS = -g -O3 -Wall -std=c++0x -DNDEBUG
 
-CFLAGS = -c -g -O3 -Wall -std=c++0x
-FINAL_CFLAGS = -g -O3 -Wall -std=c++0x
+# CFLAGS = -c -g -O3 -Wall -std=c++0x
+# FINAL_CFLAGS = -g -O3 -Wall -std=c++0x
 
-# CFLAGS = -c -g -O0 -Wall -std=c++0x
-# FINAL_CFLAGS = -g -O0 -Wall -std=c++0x
+CFLAGS = -c -g -O0 -Wall -std=c++0x
+FINAL_CFLAGS = -g -O0 -Wall -std=c++0x
 BINARY = astranza2
 OBJS = board.o jouseki.o pattern.o ai.o history.o menu.o
 COMPILE = g++ $(CFLAGS)
