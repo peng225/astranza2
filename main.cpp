@@ -2,6 +2,7 @@
 #include "history.h"
 #include "ai.h"
 #include "menu.h"
+#include "learner.h"
 #include <assert.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -22,6 +23,7 @@ int main(int argc, char *argv[])
 {
   Board board;
   AI ai;
+  Learner ln;
   list<History> hist;
   int depth = DEFAULT_DEPTH;
 
@@ -85,7 +87,9 @@ int main(int argc, char *argv[])
       ai.setTime(time);
       cout << "Search time was changed to " << time << "." << endl;
     }
-    // else if(command == "learn" || command == "l") learn(*ist);
+    else if(command == "learn" || command == "l"){
+      ln.learn("hoge");
+    }
     // else if(command == "generate" || command == "g") gen_kifu(*ist);
     else if(command == "init" || command == "i"){
       board.init();
