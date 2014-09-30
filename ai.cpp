@@ -30,6 +30,26 @@ MoveInfo AI::eval(const Board &board)
     }else{
       info.score = -MAX_VALUE + pt.evalFeature(board);
     }
+    return info;
+  }
+  // ここはなんで+=なんだ？
+  info.score += pt.evalFeature(board);
+  return info;
+}
+
+DetailedMoveInfo AI::detailedEval(const Board &board)
+{
+  DetailedMoveInfo info;
+  //勝敗が決まっていたら、max or minの評価値を返す
+  if(board.isEnd()){
+    State_t winner = board.getWinner();
+    if(winner == board.getTurn()){
+      info.score = MAX_VALUE + pt.evalFeature(board);
+    }else if(winner == SPACE){
+      info.score = 0;
+    }else{
+      info.score = -MAX_VALUE + pt.evalFeature(board);
+    }
     info.board = board;
     return info;
   }
@@ -42,12 +62,6 @@ MoveInfo AI::eval(const Board &board)
 
 // NegaScout
 // 主にプレイ時に使用
-/*
-  パスの仕様を変更し、
-  turnやtesuuをBoardクラス内で自動的に変更するようにしたため、
-  探索時にパスをどのように検出するかが問題となる。
-  どうしよう。
-*/
 MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
 		       // bool isOrdering, bool isProb,
 		       // int pcx, int pcy)
@@ -193,10 +207,8 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
   // 学習に必要とか？
   double maxScore;
   int tx = 0, ty = 0;
-  Board tmpBoard;
   
   maxScore = info.score;
-  tmpBoard = info.board;
   tx = availPos.front().first;
   ty = availPos.front().second;
 
@@ -243,7 +255,6 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
       maxScore = info.score;
       tx = itr->first;
       ty = itr->second;
-      tmpBoard = info.board;
     }
 
     board.undo(itr->first, itr->second, revPattern);
@@ -253,7 +264,6 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
   info.x = tx;
   info.y = ty;
   info.score = maxScore;
-  info.board = tmpBoard;
   //Hashにまだ登録されていなければ登録
   //ここに書くのは正しいのだろうか・・・
   //枝刈りされなかったときはここに来るのでよいのだが、
@@ -274,6 +284,165 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
     bh.at(board).y = info.y;
     bh.at(board).score = info.score;
   }
+  return info;
+}
+
+DetailedMoveInfo AI::detailedNegascout(Board &board, int alpha, int beta, int depth)
+{
+  DetailedMoveInfo info; 
+
+  numSearchNode++;
+  
+  //リーフなら評価値を返す
+  assert(depth >= 0);
+  if(depth == 0 || board.isEnd()){
+    info = detailedEval(board);
+    return info;
+  }
+
+  list<pair<int, int> > availPos;
+  
+  // List up all places where you can put a stone
+  for(list<std::pair<int, int> >::const_iterator itr = begin(board.getCl()); 
+      itr != end(board.getCl()); itr++){
+    if(board.canPut(itr->first, itr->second)){
+      availPos.push_back(*itr);      
+    }
+  }
+  
+  // 置く場所がなかったらパス
+  if(availPos.size() == 0){
+    assert(board.isPass());
+    board.changeTurn();
+    info = detailedNegascout(board, -beta, -alpha, depth - 1); 
+    info.score *= -1;
+    // ここでもう一度turnを変えないと、呼び出し元でのturnがおかしくなる
+    board.changeTurn();
+    return info;
+  }
+
+  // 浅い探索によるmove ordering
+  // ただし深さが小さい(具体的には2以下)ときは行わない
+  // ただし反復深化によるmove orderingが優先
+  if(depth >= THRESH_MOVE_ORDERING_DEPTH){  
+    BitBoard revPattern;
+    MoveInfo moInfo;
+    map<int, pair<int, int> > moveScore;
+    for(list<pair<int, int> >::iterator i = begin(availPos);
+	i != end(availPos); i++){
+      revPattern = board.putStone(i->first, i->second);
+      assert(revPattern != 0);
+      // 浅い探索
+      moInfo = negascout(board, -beta, -alpha, 1);
+      /*
+	ここではscoreに-1をかけない。
+	後でmapのキーでソートを行うが、
+	このとき自動的に昇順ソートになるため、
+	あえて大小関係を逆にしておいた方がよいのである。
+      */
+      board.undo(i->first, i->second, revPattern);
+      moveScore[moInfo.score] = *i;
+      // cout << i->first << ", " << i->second << endl;
+    }
+    
+    availPos.clear();
+    for(map<int, pair<int, int> >::iterator i = begin(moveScore);
+	i != end(moveScore); i++){
+      availPos.push_back(i->second);
+      // cout << i->first << ": " << i->second.first+1 << ", "
+      // 	   << i->second.second+1 << endl;
+    }
+  }  
+  
+  // first child
+  // Put a stone on the first child node.
+  BitBoard revPattern;
+
+  revPattern = board.putStone(availPos.front().first,
+			      availPos.front().second);
+  assert(revPattern != 0);
+  info = detailedNegascout(board, -beta, -alpha, depth - 1);
+  info.score *= -1;
+  /*
+    手を打つ度に盤面オブジェクトを作るのは非常にコストがかかるので、
+    一手打ち、その探索が終わったら手を戻すようにしている。
+  */
+  board.undo(availPos.front().first, availPos.front().second, revPattern);
+  
+  if(info.score >= beta){  // βカット
+    info.x = 0;
+    info.y = 0;
+    return info;
+  }
+  if(alpha < info.score){
+    alpha = info.score;
+  }
+
+  // MoveInfoが盤面情報を持つ必要ってあるのか？
+  // 学習に必要とか？
+  double maxScore;
+  int tx = 0, ty = 0;
+  Board tmpBoard;
+  
+  maxScore = info.score;
+  tmpBoard = info.board;
+  tx = availPos.front().first;
+  ty = availPos.front().second;
+
+  
+  for(list<pair<int, int> >::const_iterator itr = next(begin(availPos));
+      itr != end(availPos); itr++){
+    // // Put a stone on the child node.
+    // revPattern = board.putStone(itr->first, itr->second);
+    // assert(revPattern != 0);
+    // info = negascout(board, -beta, -alpha, depth - 1);
+    // info.score *= -1;
+    // board.undo(itr->first, itr->second, revPattern);
+
+    
+
+    // Null Window Search
+    revPattern = board.putStone(itr->first, itr->second);
+    assert(revPattern != 0);
+
+    info = detailedNegascout(board, -alpha - 1, -alpha, depth - 1);
+    info.score *= -1;    
+    
+    if(beta <= info.score){
+      board.undo(itr->first, itr->second, revPattern);
+      info.x = 0;
+      info.y = 0;
+      // cout << "null beta cut" << endl;
+      return info;
+    }else if(alpha < info.score){
+      alpha = info.score;
+      info = detailedNegascout(board, -beta, -alpha, depth - 1);
+      info.score *= -1;
+      if(beta <= info.score){
+	// cout << "real beta cut" << endl;
+	board.undo(itr->first, itr->second, revPattern);
+	info.x = 0;
+	info.y = 0;
+	return info;
+      }else if(alpha < info.score){
+	alpha = info.score;
+      }
+    }
+    if(maxScore < info.score){      
+      maxScore = info.score;
+      tx = itr->first;
+      ty = itr->second;
+      tmpBoard = info.board;
+    }
+
+    board.undo(itr->first, itr->second, revPattern);
+  }
+
+  
+  info.x = tx;
+  info.y = ty;
+  info.score = maxScore;
+  info.board = tmpBoard;
   return info;
 }
 

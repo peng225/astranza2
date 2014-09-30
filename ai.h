@@ -49,8 +49,13 @@ struct MoveInfo
   int x;
   int y;
   double score;
-  Board board;
 MoveInfo() : x(0), y(0), score(0){}
+};
+
+struct DetailedMoveInfo : public MoveInfo
+{
+ public:
+  Board board;
 };
 
 /** You control the search time
@@ -115,6 +120,9 @@ class AI
   MoveInfo negascout(Board &board, int alpha, int beta, int depth);
 		     /* bool isOrdering = true, bool isProb = true, */
 		     /* int pcx = 0, int pcy = 0); */
+
+  DetailedMoveInfo detailedNegascout(Board &board, int alpha, int beta, int depth);
+  
   //MoveInfo sc_jamboree(const spBan ban, int turn, int alpha, int beta, int depth, bool is_root = false);
   /** This function is intended to be used in actual game play.
    * If "is_itr" is true, the iteretive deepning algorithm runs.
@@ -125,6 +133,7 @@ class AI
    * or describes 5000 points to the usual return value.
    */
   MoveInfo eval(const Board &board);
+  DetailedMoveInfo detailedEval(const Board &board);
   
  private:
   Jouseki jouseki;
