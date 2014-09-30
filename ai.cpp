@@ -32,29 +32,26 @@ MoveInfo AI::eval(const Board &board)
     }
     return info;
   }
-  // ここはなんで+=なんだ？
-  info.score += pt.evalFeature(board);
+  info.score = pt.evalFeature(board);
   return info;
 }
 
 DetailedMoveInfo AI::detailedEval(const Board &board)
 {
   DetailedMoveInfo info;
-  //勝敗が決まっていたら、max or minの評価値を返す
-  if(board.isEnd()){
-    State_t winner = board.getWinner();
-    if(winner == board.getTurn()){
-      info.score = MAX_VALUE + pt.evalFeature(board);
-    }else if(winner == SPACE){
-      info.score = 0;
-    }else{
-      info.score = -MAX_VALUE + pt.evalFeature(board);
-    }
-    info.board = board;
-    return info;
-  }
-  // ここはなんで+=なんだ？
-  info.score += pt.evalFeature(board);
+  // if(board.isEnd()){
+  //   State_t winner = board.getWinner();
+  //   if(winner == board.getTurn()){
+  //     info.score = MAX_VALUE + pt.evalFeature(board);
+  //   }else if(winner == SPACE){
+  //     info.score = 0;
+  //   }else{
+  //     info.score = -MAX_VALUE + pt.evalFeature(board);
+  //   }
+  //   info.board = board;
+  //   return info;
+  // }
+  info.score = pt.evalFeature(board);
   info.board = board;
   return info;
 }

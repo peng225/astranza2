@@ -384,7 +384,7 @@ int Pattern::evalFeature(const Board &board)
     }
   }
 
-  return (board.getTurn() == BLACK ? score : -score);
+  return MAGNITUDE * (board.getTurn() == BLACK ? score : -score);
 }
 
 // 盤面に現れる特徴のインデックスを取得

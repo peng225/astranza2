@@ -21,7 +21,7 @@ using std::next;
 
 const int INF = INT_MAX;
 const int DEFAULT_SEARCH_TIME = 1;
-const int MAX_VALUE = 5000;
+const int MAX_VALUE = 50000;
 /* const double SCALE = 1.5; */
 
 const int THRESH_MOVE_ORDERING_DEPTH = 4;
