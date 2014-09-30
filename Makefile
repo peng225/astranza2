@@ -9,7 +9,7 @@ FINAL_CFLAGS = -g -O3 -Wall -std=c++0x -flto -DNDEBUG
 # CFLAGS = -c -g -O0 -Wall -std=c++0x
 # FINAL_CFLAGS = -g -O0 -Wall -std=c++0x
 BINARY = astranza2
-OBJS = board.o jouseki.o pattern.o ai.o history.o menu.o
+OBJS = board.o jouseki.o pattern.o ai.o history.o menu.o learner.o
 COMPILE = g++ $(CFLAGS)
 
 all: $(BINARY)
@@ -33,6 +33,9 @@ history.o: history.cpp
 	$(COMPILE) $<
 
 menu.o: menu.cpp
+	$(COMPILE) $<
+
+learner.o: learner.cpp
 	$(COMPILE) $<
 
 board.o: board.h

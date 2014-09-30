@@ -74,6 +74,7 @@ class Board
     return white;
   }
   bool operator==(const Board &obj) const;
+  
  private:
   BitBoard black;
   BitBoard white;
