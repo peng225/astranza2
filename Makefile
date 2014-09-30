@@ -1,10 +1,10 @@
 #Makefile
 
-# CFLAGS = -c -g -O3 -Wall -std=c++0x -DNDEBUG
-# FINAL_CFLAGS = -g -O3 -Wall -std=c++0x -DNDEBUG
+CFLAGS = -c -g -O3 -Wall -std=c++0x -flto -DNDEBUG
+FINAL_CFLAGS = -g -O3 -Wall -std=c++0x -flto -DNDEBUG
 
-CFLAGS = -c -g -O3 -Wall -std=c++0x
-FINAL_CFLAGS = -g -O3 -Wall -std=c++0x
+# CFLAGS = -c -g -O3 -Wall -std=c++0x -flto
+# FINAL_CFLAGS = -g -O3 -Wall -std=c++0x -flto
 
 # CFLAGS = -c -g -O0 -Wall -std=c++0x
 # FINAL_CFLAGS = -g -O0 -Wall -std=c++0x

@@ -102,6 +102,8 @@ int main(int argc, char *argv[])
     // else if(command == "help" || command == "h") help();
     else if(command == "quit" || command == "q") break;
     // else if(command == "estimate" || command == "es") estimate(*ist);
+    else if(command == ""){
+    }
     else{
       cerr << "No such command exists." << endl;
     }

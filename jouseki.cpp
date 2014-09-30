@@ -95,7 +95,7 @@ bool Jouseki::useJouseki(Board &board)
 	itr++;
       }
       board.putStone(itr->first, itr->second);
-      std::cout << itr->first << ", " << itr->second << std::endl;
+      std::cout << itr->first + 1 << ", " << itr->second + 1 << std::endl;
       return true;
     }
   }
