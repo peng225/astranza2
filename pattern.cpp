@@ -58,7 +58,7 @@ void Pattern::loadWeight(std::string wName)
 
 // パターンによる評価値を返す
 // 各特徴のインデックスを３進数を用いて表現している
-int Pattern::evalFeature(const Board &board)
+double Pattern::evalFeature(const Board &board)
 {
   double score = 0;
   int index;
@@ -767,17 +767,17 @@ void Pattern::extractFeatureIndices(const Board &board, std::vector<int> &indice
 
 }
 
-void Pattern::normalizeWeight(int norm)
-{
-  long long int nsum = 0;
-  for(int i = 0; i < FEATURE_NUM; i++){
-    double weight = getWeight(i);
-    nsum += (long long int)(weight * weight);
-  }
-  std::cout << nsum << std::endl;
-  nsum = (long long int)sqrt(nsum);
-  for(int i = 0; i < FEATURE_NUM; i++){
-    double weight = getWeight(i);
-    setWeight(i, (int)(weight * norm / nsum));
-  }
-}
+// void Pattern::normalizeWeight(int norm)
+// {
+//   long long int nsum = 0;
+//   for(int i = 0; i < FEATURE_NUM; i++){
+//     double weight = getWeight(i);
+//     nsum += (long long int)(weight * weight);
+//   }
+//   std::cout << nsum << std::endl;
+//   nsum = (long long int)sqrt(nsum);
+//   for(int i = 0; i < FEATURE_NUM; i++){
+//     double weight = getWeight(i);
+//     setWeight(i, (int)(weight * norm / nsum));
+//   }
+// }

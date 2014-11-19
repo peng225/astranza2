@@ -77,9 +77,9 @@ public:
   int turn;  //その盤面での手番
   int depth;  //その盤面に辿り着いた時の残り探索深さ
   int x, y;
-  int score;  //その盤面の評価値
+  double score;  //その盤面の評価値
 BoardState() : turn(0), depth(-1), x(0), y(0), score(0){}
-  BoardState(int turn, int depth, int x, int y, int score){
+  BoardState(int turn, int depth, int x, int y, double score){
     this->turn = turn;
     this->depth = depth;
     this->x = x;
@@ -117,11 +117,11 @@ class AI
    * the child node which you can get by putting a stone on "pcx", "pcy".
    * This is available when "is_ordering" is false.
    */
-  MoveInfo negascout(Board &board, int alpha, int beta, int depth);
+  MoveInfo negascout(Board &board, double alpha, double beta, int depth);
 		     /* bool isOrdering = true, bool isProb = true, */
 		     /* int pcx = 0, int pcy = 0); */
 
-  DetailedMoveInfo detailedNegascout(Board &board, int alpha, int beta, int depth);
+  DetailedMoveInfo detailedNegascout(Board &board, double alpha, double beta, int depth);
   
   //MoveInfo sc_jamboree(const spBan ban, int turn, int alpha, int beta, int depth, bool is_root = false);
   /** This function is intended to be used in actual game play.

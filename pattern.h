@@ -11,7 +11,7 @@
 const int NUM_SIMPLE_SYMMETRY = 2;
 const int NUM_SYMMETRY = 4;
 
-const int MAGNITUDE = 100;
+const int MAGNITUDE = 1;
 
 // each feature's number
 const int MAX_P10 = 59049;
@@ -45,7 +45,7 @@ class Pattern
   Pattern();
   void initWeight();
   void loadWeight(std::string wName);
-  int evalFeature(const Board &board);
+  double evalFeature(const Board &board);
   void setWeight(int i, double val)
   {
     weight[i] = val;
@@ -55,7 +55,7 @@ class Pattern
     return weight[i];
   }
   void extractFeatureIndices(const Board &board, std::vector<int> &indices);
-  void normalizeWeight(int norm);
+  /* void normalizeWeight(int norm); */
  private:
   double weight[FEATURE_NUM]; 
 };

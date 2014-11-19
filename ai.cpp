@@ -59,7 +59,7 @@ DetailedMoveInfo AI::detailedEval(const Board &board)
 
 // NegaScout
 // 主にプレイ時に使用
-MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
+MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
 		       // bool isOrdering, bool isProb,
 		       // int pcx, int pcy)
 {
@@ -149,7 +149,7 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
   if(depth >= THRESH_MOVE_ORDERING_DEPTH){  
     BitBoard revPattern;
     MoveInfo moInfo;
-    map<int, pair<int, int> > moveScore;
+    map<double, pair<int, int> > moveScore;
     for(list<pair<int, int> >::iterator i = begin(availPos);
 	i != end(availPos); i++){
       revPattern = board.putStone(i->first, i->second);
@@ -168,7 +168,7 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
     }
     
     availPos.clear();
-    for(map<int, pair<int, int> >::iterator i = begin(moveScore);
+    for(map<double, pair<int, int> >::iterator i = begin(moveScore);
 	i != end(moveScore); i++){
       availPos.push_back(i->second);
       // cout << i->first << ": " << i->second.first+1 << ", "
@@ -284,7 +284,7 @@ MoveInfo AI::negascout(Board &board, int alpha, int beta, int depth)
   return info;
 }
 
-DetailedMoveInfo AI::detailedNegascout(Board &board, int alpha, int beta, int depth)
+DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, int depth)
 {
   DetailedMoveInfo info; 
 
@@ -324,7 +324,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, int alpha, int beta, int de
   if(depth >= THRESH_MOVE_ORDERING_DEPTH){  
     BitBoard revPattern;
     MoveInfo moInfo;
-    map<int, pair<int, int> > moveScore;
+    map<double, pair<int, int> > moveScore;
     for(list<pair<int, int> >::iterator i = begin(availPos);
 	i != end(availPos); i++){
       revPattern = board.putStone(i->first, i->second);
@@ -343,7 +343,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, int alpha, int beta, int de
     }
     
     availPos.clear();
-    for(map<int, pair<int, int> >::iterator i = begin(moveScore);
+    for(map<double, pair<int, int> >::iterator i = begin(moveScore);
 	i != end(moveScore); i++){
       availPos.push_back(i->second);
       // cout << i->first << ": " << i->second.first+1 << ", "
