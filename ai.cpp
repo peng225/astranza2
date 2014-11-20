@@ -68,8 +68,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
   //タイムオーバーなら探索打ち切り
   if((double)((int)clock() - st.start) / (double)CLOCKS_PER_SEC
      >= st.searchTime){
-    info.x = 0;
-    info.y = 0;
+    info.pos = 0;
     return info;
   }
 
@@ -79,8 +78,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
   if(bh.find(board) != end(bh)){
     BoardState bs = bh.at(board);
     if(bs.depth >= depth && bs.turn == board.getTurn()){
-      info.x = bs.x;
-      info.y = bs.y;
+      info.pos = bs.pos;
       info.score = bs.score;
       // std::cout << "Hash hit!" << std::endl;
       return info;
@@ -94,12 +92,12 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
     return info;
   }
 
-  list<pair<int, int> > availPos;
+  list<BitBoard> availPos;
   
   // List up all places where you can put a stone
-  for(list<std::pair<int, int> >::const_iterator itr = begin(board.getCl()); 
+  for(list<BitBoard>::const_iterator itr = begin(board.getCl()); 
       itr != end(board.getCl()); itr++){
-    if(board.canPut(itr->first, itr->second)){
+    if(board.canPut(*itr)){
       availPos.push_back(*itr);      
     }
   }
@@ -149,10 +147,10 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
   if(depth >= THRESH_MOVE_ORDERING_DEPTH){  
     BitBoard revPattern;
     MoveInfo moInfo;
-    map<double, pair<int, int> > moveScore;
-    for(list<pair<int, int> >::iterator i = begin(availPos);
+    map<double, BitBoard> moveScore;
+    for(list<BitBoard>::iterator i = begin(availPos);
 	i != end(availPos); i++){
-      revPattern = board.putStone(i->first, i->second);
+      revPattern = board.putStone(*i);
       assert(revPattern != 0);
       // 浅い探索
       moInfo = negascout(board, -beta, -alpha, 1);
@@ -162,13 +160,13 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
 	このとき自動的に昇順ソートになるため、
 	あえて大小関係を逆にしておいた方がよいのである。
       */
-      board.undo(i->first, i->second, revPattern);
+      board.undo(*i, revPattern);
       moveScore[moInfo.score] = *i;
       // cout << i->first << ", " << i->second << endl;
     }
     
     availPos.clear();
-    for(map<double, pair<int, int> >::iterator i = begin(moveScore);
+    for(map<double, BitBoard>::iterator i = begin(moveScore);
 	i != end(moveScore); i++){
       availPos.push_back(i->second);
       // cout << i->first << ": " << i->second.first+1 << ", "
@@ -180,8 +178,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
   // Put a stone on the first child node.
   BitBoard revPattern;
 
-  revPattern = board.putStone(availPos.front().first,
-			      availPos.front().second);
+  revPattern = board.putStone(availPos.front());
   assert(revPattern != 0);
   info = negascout(board, -beta, -alpha, depth - 1);
   info.score *= -1;
@@ -189,11 +186,10 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
     手を打つ度に盤面オブジェクトを作るのは非常にコストがかかるので、
     一手打ち、その探索が終わったら手を戻すようにしている。
   */
-  board.undo(availPos.front().first, availPos.front().second, revPattern);
+  board.undo(availPos.front(), revPattern);
   
   if(info.score >= beta){  // βカット
-    info.x = 0;
-    info.y = 0;
+    info.pos = 0;
     return info;
   }
   if(alpha < info.score){
@@ -203,14 +199,13 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
   // MoveInfoが盤面情報を持つ必要ってあるのか？
   // 学習に必要とか？
   double maxScore;
-  int tx = 0, ty = 0;
+  BitBoard tPos = 0;
   
   maxScore = info.score;
-  tx = availPos.front().first;
-  ty = availPos.front().second;
+  tPos = availPos.front();
 
   
-  for(list<pair<int, int> >::const_iterator itr = next(begin(availPos));
+  for(list<BitBoard>::const_iterator itr = next(begin(availPos));
       itr != end(availPos); itr++){
     // // Put a stone on the child node.
     // revPattern = board.putStone(itr->first, itr->second);
@@ -222,16 +217,15 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
     
 
     // Null Window Search
-    revPattern = board.putStone(itr->first, itr->second);
+    revPattern = board.putStone(*itr);
     assert(revPattern != 0);
 
     info = negascout(board, -alpha - 1, -alpha, depth - 1);
     info.score *= -1;    
     
     if(beta <= info.score){
-      board.undo(itr->first, itr->second, revPattern);
-      info.x = 0;
-      info.y = 0;
+      board.undo(*itr, revPattern);
+      info.pos = 0;
       // cout << "null beta cut" << endl;
       return info;
     }else if(alpha < info.score){
@@ -240,9 +234,8 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
       info.score *= -1;
       if(beta <= info.score){
 	// cout << "real beta cut" << endl;
-	board.undo(itr->first, itr->second, revPattern);
-	info.x = 0;
-	info.y = 0;
+	board.undo(*itr, revPattern);
+	info.pos = 0;
 	return info;
       }else if(alpha < info.score){
 	alpha = info.score;
@@ -250,16 +243,14 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
     }
     if(maxScore < info.score){      
       maxScore = info.score;
-      tx = itr->first;
-      ty = itr->second;
+      tPos = *itr;
     }
 
-    board.undo(itr->first, itr->second, revPattern);
+    board.undo(*itr, revPattern);
   }
 
   
-  info.x = tx;
-  info.y = ty;
+  info.pos = tPos;
   info.score = maxScore;
   //Hashにまだ登録されていなければ登録
   //ここに書くのは正しいのだろうか・・・
@@ -271,14 +262,13 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
      (double)CLOCKS_PER_SEC >= st.searchTime){
     ; //Do nothing
   }else if(bh.find(board) == bh.end()){
-    BoardState tbs(board.getTurn(), depth, info.x, info.y, info.score);
+    BoardState tbs(board.getTurn(), depth, info.pos, info.score);
     bh[board] = tbs;
   }else if(bh.at(board).depth < depth){
     //登録済のものよりdepthが大きければ更新
     bh.at(board).turn = board.getTurn();
     bh.at(board).depth = depth;
-    bh.at(board).x = info.x;
-    bh.at(board).y = info.y;
+    bh.at(board).pos = info.pos;
     bh.at(board).score = info.score;
   }
   return info;
@@ -297,12 +287,12 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
     return info;
   }
 
-  list<pair<int, int> > availPos;
+  list<BitBoard> availPos;
   
   // List up all places where you can put a stone
-  for(list<std::pair<int, int> >::const_iterator itr = begin(board.getCl()); 
+  for(list<BitBoard>::const_iterator itr = begin(board.getCl()); 
       itr != end(board.getCl()); itr++){
-    if(board.canPut(itr->first, itr->second)){
+    if(board.canPut(*itr)){
       availPos.push_back(*itr);      
     }
   }
@@ -324,10 +314,10 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
   if(depth >= THRESH_MOVE_ORDERING_DEPTH){  
     BitBoard revPattern;
     MoveInfo moInfo;
-    map<double, pair<int, int> > moveScore;
-    for(list<pair<int, int> >::iterator i = begin(availPos);
+    map<double, BitBoard> moveScore;
+    for(list<BitBoard>::iterator i = begin(availPos);
 	i != end(availPos); i++){
-      revPattern = board.putStone(i->first, i->second);
+      revPattern = board.putStone(*i);
       assert(revPattern != 0);
       // 浅い探索
       moInfo = negascout(board, -beta, -alpha, 1);
@@ -337,13 +327,13 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
 	このとき自動的に昇順ソートになるため、
 	あえて大小関係を逆にしておいた方がよいのである。
       */
-      board.undo(i->first, i->second, revPattern);
+      board.undo(*i, revPattern);
       moveScore[moInfo.score] = *i;
       // cout << i->first << ", " << i->second << endl;
     }
     
     availPos.clear();
-    for(map<double, pair<int, int> >::iterator i = begin(moveScore);
+    for(map<double, BitBoard>::iterator i = begin(moveScore);
 	i != end(moveScore); i++){
       availPos.push_back(i->second);
       // cout << i->first << ": " << i->second.first+1 << ", "
@@ -355,8 +345,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
   // Put a stone on the first child node.
   BitBoard revPattern;
 
-  revPattern = board.putStone(availPos.front().first,
-			      availPos.front().second);
+  revPattern = board.putStone(availPos.front());
   assert(revPattern != 0);
   info = detailedNegascout(board, -beta, -alpha, depth - 1);
   info.score *= -1;
@@ -364,11 +353,10 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
     手を打つ度に盤面オブジェクトを作るのは非常にコストがかかるので、
     一手打ち、その探索が終わったら手を戻すようにしている。
   */
-  board.undo(availPos.front().first, availPos.front().second, revPattern);
+  board.undo(availPos.front(), revPattern);
   
   if(info.score >= beta){  // βカット
-    info.x = 0;
-    info.y = 0;
+    info.pos = 0;
     return info;
   }
   if(alpha < info.score){
@@ -378,16 +366,15 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
   // MoveInfoが盤面情報を持つ必要ってあるのか？
   // 学習に必要とか？
   double maxScore;
-  int tx = 0, ty = 0;
+  int tPos = 0;
   Board tmpBoard;
   
   maxScore = info.score;
   tmpBoard = info.board;
-  tx = availPos.front().first;
-  ty = availPos.front().second;
+  tPos = availPos.front();
 
   
-  for(list<pair<int, int> >::const_iterator itr = next(begin(availPos));
+  for(list<BitBoard>::const_iterator itr = next(begin(availPos));
       itr != end(availPos); itr++){
     // // Put a stone on the child node.
     // revPattern = board.putStone(itr->first, itr->second);
@@ -399,16 +386,15 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
     
 
     // Null Window Search
-    revPattern = board.putStone(itr->first, itr->second);
+    revPattern = board.putStone(*itr);
     assert(revPattern != 0);
 
     info = detailedNegascout(board, -alpha - 1, -alpha, depth - 1);
     info.score *= -1;    
     
     if(beta <= info.score){
-      board.undo(itr->first, itr->second, revPattern);
-      info.x = 0;
-      info.y = 0;
+      board.undo(*itr, revPattern);
+      info.pos = 0;
       // cout << "null beta cut" << endl;
       return info;
     }else if(alpha < info.score){
@@ -417,9 +403,8 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
       info.score *= -1;
       if(beta <= info.score){
 	// cout << "real beta cut" << endl;
-	board.undo(itr->first, itr->second, revPattern);
-	info.x = 0;
-	info.y = 0;
+	board.undo(*itr, revPattern);
+	info.pos = 0;
 	return info;
       }else if(alpha < info.score){
 	alpha = info.score;
@@ -427,17 +412,15 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
     }
     if(maxScore < info.score){      
       maxScore = info.score;
-      tx = itr->first;
-      ty = itr->second;
+      tPos = *itr;
       tmpBoard = info.board;
     }
 
-    board.undo(itr->first, itr->second, revPattern);
+    board.undo(*itr, revPattern);
   }
 
   
-  info.x = tx;
-  info.y = ty;
+  info.pos = tPos;
   info.score = maxScore;
   info.board = tmpBoard;
   return info;
@@ -503,7 +486,7 @@ void AI::search(Board &board, int depth, bool is_itr)
   // 結果が確定していないnewInfoを使ってはいけない
   std::cout << "x , y, score = " << info.x + 1 << ", " << info.y + 1 << ", "
 	    << info.score << std::endl;
-  board.putStone(info.x, info.y);
+  board.putStone(info.pos);
   return;
 }
 

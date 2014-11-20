@@ -46,10 +46,9 @@ const int THRESH_MOVE_ORDERING_DEPTH = 4;
 struct MoveInfo
 {
  public:
-  int x;
-  int y;
+  BitBoard pos;
   double score;
-MoveInfo() : x(0), y(0), score(0){}
+MoveInfo() : pos(0), score(0){}
 };
 
 struct DetailedMoveInfo : public MoveInfo
@@ -76,14 +75,13 @@ struct BoardState
 public:
   int turn;  //その盤面での手番
   int depth;  //その盤面に辿り着いた時の残り探索深さ
-  int x, y;
+  BitBoard pos;
   double score;  //その盤面の評価値
-BoardState() : turn(0), depth(-1), x(0), y(0), score(0){}
-  BoardState(int turn, int depth, int x, int y, double score){
+BoardState() : turn(0), depth(-1), pos(0), score(0){}
+  BoardState(int turn, int depth, BitBoard pos, double score){
     this->turn = turn;
     this->depth = depth;
-    this->x = x;
-    this->y = y;
+    this->pos = pos;
     this->score = score;
   }
 };

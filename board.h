@@ -54,7 +54,7 @@ class Board
   State_t getWinner() const;
   /** Check if the player whose turn is "turn" must pass or not. */
   bool isPass() const;
-  std::list<std::pair<int, int> >& getCl(){return candList;}
+  std::list<BitBoard>& getCl(){return candList;}
   void display() const;
   State_t getTurn() const
   {
