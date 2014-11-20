@@ -14,7 +14,7 @@ void Board::init()
   tesuu = 1;
 
   candList.clear();
-  pair<int, int> pos(2, 2);
+  BitBoard pos = MSB_ONLY_64 >> (2 + 2 * BOARD_SIZE);
   candList.push_back(pos);
   
   pos = transfer(pos, RIGHT);
@@ -56,13 +56,12 @@ void Board::init()
   // }
 }
 
-State_t Board::getState(int x, int y) const
+State_t Board::getState(BitBoard pos) const
 {
-  assert(0 <= x && x < BOARD_SIZE &&
-	 0 <= y && y < BOARD_SIZE);
+  assert(isValidPos(pos));
   BitBoard isBlack, isWhite;
-  isBlack = black & (MSB_ONLY_64 >> (x + y * BOARD_SIZE));
-  isWhite = white & (MSB_ONLY_64 >> (x + y * BOARD_SIZE));
+  isBlack = black & pos;
+  isWhite = white & pos;
   assert(isBlack == 0 || isWhite == 0);
   
   if(isBlack > 0){
@@ -71,6 +70,289 @@ State_t Board::getState(int x, int y) const
     return WHITE;
   }else{
     return SPACE;
+  }
+}
+
+
+
+// pair<int, int> Board::transfer(pair<int, int> pos, Direction d) const
+// {
+//   pair<int, int> newPos;
+
+//   // newPosが盤外にはみ出す場合が考慮されていない
+//   switch(d){
+//   case LEFT_UP:
+//     newPos.first = pos.first - 1;
+//     newPos.second = pos.second - 1;
+//     break;
+//   case UP:
+//     newPos.first = pos.first;
+//     newPos.second = pos.second - 1;
+//     break;
+//   case RIGHT_UP:
+//     newPos.first = pos.first + 1;
+//     newPos.second = pos.second - 1;
+//     break;
+//   case RIGHT:
+//     newPos.first = pos.first + 1;
+//     newPos.second = pos.second;
+//     break;
+//   case RIGHT_DOWN:
+//     newPos.first = pos.first + 1;
+//     newPos.second = pos.second + 1;
+//     break;
+//   case DOWN:
+//     newPos.first = pos.first;
+//     newPos.second = pos.second + 1;
+//     break;
+//   case LEFT_DOWN:
+//     newPos.first = pos.first - 1;
+//     newPos.second = pos.second + 1;
+//     break;
+//   case LEFT:
+//     newPos.first = pos.first - 1;
+//     newPos.second = pos.second;
+//     break;
+//   }
+
+//   return newPos;
+// }
+
+BitBoard Board::putStone(BitBoard pos)
+{ 
+  if(isValidPos(pos)){
+    return 0;
+  }
+  
+  BitBoard revPattern = 0;
+  
+  // 空白の位置にのみ石を置ける
+  if(((black | white) & pos) != 0){
+    return 0;
+  }
+
+  const BitBoard ME = (turn == BLACK ? black : white);
+  const BitBoard OPPONENT = (turn == BLACK ? white : black);
+
+  
+  for(int i = 0; i < NUM_DIRECTION; i++){    
+    BitBoard tmpRevPattern = 0;
+    BitBoard mask = transfer(pos, DIRS[i]);
+    // 相手の石が存在する間ループ
+    while(mask != 0 && (mask & OPPONENT) != 0) {
+        tmpRevPattern |= mask;
+        mask = transfer(mask, DIRS[i]);
+    }
+    // 上のループでたどった先に自分の石がなければひっくり返せない
+    if((mask & ME) != 0){
+      revPattern |= tmpRevPattern;
+    }
+  }
+
+  // 石の反転を適用
+  if(revPattern == 0){
+    return 0;
+  }else if(ME == black){
+    black ^= pos | revPattern;
+    white ^= revPattern;
+  }else{
+    white ^= pos | revPattern;
+    black ^= revPattern;
+  }
+
+  forwardUpdateCandList(pos);
+  changeTurn();  
+  tesuu++;
+  return revPattern;
+}
+
+void Board::display() const
+{
+  cout << "   ";
+  for(int i = 0; i < BOARD_SIZE; i++){
+    cout << i + 1 << " ";
+  }
+  cout << endl;
+  
+  for(int i = 0; i < BOARD_SIZE; i++){
+    cout << i + 1 << " |";
+    for(int j = 0; j < BOARD_SIZE; j++){
+      BitBoard pos = xyToPos(j, i);
+      if(getState(pos) == BLACK){
+	cout << "b";
+      }else if(getState(pos) == WHITE){
+	cout << "w";
+      }else{
+	cout << " ";
+      }
+      cout << "|";
+    }
+    cout << endl;
+  }
+  cout << endl;
+}
+
+void Board::undo(BitBoard pos, BitBoard revPattern)
+{
+  const BitBoard OPPONENT = (turn == BLACK ? white : black);
+
+  if(OPPONENT == black){
+    black ^= pos | revPattern;
+    white ^= revPattern;
+  }else{
+    white ^= pos | revPattern;
+    black ^= revPattern;
+  }
+  
+  backUpdateCandList(pos);
+  changeTurn();
+  tesuu--;
+}
+
+bool Board::canPut (BitBoard pos) const
+{
+  if(isValidPos(pos)){
+    return false;
+  }   
+  
+  // 空白の位置にのみ石を置ける
+  if(((black | white) & pos) != 0){
+    return false;
+  }
+
+  const BitBoard ME = (turn == BLACK ? black : white);
+  const BitBoard OPPONENT = (turn == BLACK ? white : black);
+
+  
+  for(int i = 0; i < NUM_DIRECTION; i++){    
+    BitBoard tmpRevPattern = 0;
+    BitBoard mask = transfer(pos, DIRS[i]);
+    int oppStoneCount = 0;
+    // 相手の石が存在する間ループ
+    while(mask != 0 && (mask & OPPONENT) != 0) {
+        tmpRevPattern |= mask;
+        mask = transfer(mask, DIRS[i]);
+	oppStoneCount++;
+    }
+    /*
+      上のループでたどった先に自分の石があり、
+      かつひっくり返す石が１つでもあればO.K.
+    */
+    if((mask & ME) != 0 && oppStoneCount != 0){
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+bool Board::isEnd() const
+{
+  for(list<BitBoard>::const_iterator itr = begin(candList);
+      itr != end(candList); itr++){
+    if(canPut(*itr)){
+      return false;
+    }
+  }
+  return true;
+}
+
+State_t Board::getWinner() const
+{
+  int blackCount = 0;
+  int whiteCount = 0;
+  for(int i = 0; i < BOARD_SIZE; i++){
+    for(int j = 0; j < BOARD_SIZE; j++){
+      BitBoard pos = xyToPos(i, j);
+      if(getState(pos) == BLACK){
+	blackCount++;
+      }else if(getState(pos) == WHITE){
+	whiteCount++;
+      }
+    }
+  }
+  if(blackCount > whiteCount) return BLACK;
+  else if(blackCount == whiteCount) return SPACE;
+  else return WHITE;
+}
+
+bool Board::isPass() const
+{ 
+  for(list<BitBoard>::const_iterator itr = begin(candList);
+      itr != end(candList); itr++){
+    if(canPut(*itr)){
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool Board::operator==(const Board &obj) const
+{
+  if(black == obj.black && white == obj.white){
+    assert(tesuu == obj.tesuu);
+    assert(turn == obj.turn);
+    return true;
+  }else{
+    return false;
+  }
+}
+
+void Board::changeTurn()
+{
+  turn = (turn == BLACK ? WHITE : BLACK);
+}
+
+void Board::forwardUpdateCandList(BitBoard pos)
+{
+  assert(isValidPos(pos));
+  
+  assert(find(begin(candList), end(candList), pos) != end(candList));
+  candList.erase(find(begin(candList), end(candList), pos));
+  
+  for(int i = 0; i < NUM_DIRECTION; i++){
+    BitBoard aroundPos = transfer(pos, DIRS[i]);
+    // 盤面からはみ出していたらダメ
+    if(!isValidPos(aroundPos)){
+      continue;
+    }
+    // スペースかつリスト未登録であれば新規登録
+    if(getState(aroundPos) == SPACE &&
+       find(begin(candList), end(candList), aroundPos) == end(candList)){
+      candList.push_back(aroundPos);
+    }
+  }
+}
+
+void Board::backUpdateCandList(BitBoard pos)
+{
+  assert(isValidPos(pos));
+  
+  candList.push_back(pos);
+
+  bool isErase = false;
+  for(list<BitBoard>::iterator itr = begin(candList);
+      itr != end(candList); itr++){
+    if(isErase){
+      itr--;
+    }
+    isErase = true;
+    for(int i = 0; i < NUM_DIRECTION; i++){
+      BitBoard aroundPos = transfer(pos, DIRS[i]);
+      // 盤面からはみ出していたらダメ
+      if(!isValidPos(aroundPos)){
+	continue;
+      }
+      if(getState(aroundPos) != SPACE){
+	isErase = false;
+	break;
+      }      
+    }
+    if(isErase){
+      // 本当はremove_ifテンプレート等を使うべき
+      itr = candList.erase(itr);
+    }
   }
 }
 
@@ -98,294 +380,12 @@ BitBoard Board::transfer(BitBoard oneBit, Direction d) const
   }
 }
 
-pair<int, int> Board::transfer(pair<int, int> pos, Direction d) const
+bool Board::isValidPos(BitBoard pos) const
 {
-  pair<int, int> newPos;
-
-  // newPosが盤外にはみ出す場合が考慮されていない
-  switch(d){
-  case LEFT_UP:
-    newPos.first = pos.first - 1;
-    newPos.second = pos.second - 1;
-    break;
-  case UP:
-    newPos.first = pos.first;
-    newPos.second = pos.second - 1;
-    break;
-  case RIGHT_UP:
-    newPos.first = pos.first + 1;
-    newPos.second = pos.second - 1;
-    break;
-  case RIGHT:
-    newPos.first = pos.first + 1;
-    newPos.second = pos.second;
-    break;
-  case RIGHT_DOWN:
-    newPos.first = pos.first + 1;
-    newPos.second = pos.second + 1;
-    break;
-  case DOWN:
-    newPos.first = pos.first;
-    newPos.second = pos.second + 1;
-    break;
-  case LEFT_DOWN:
-    newPos.first = pos.first - 1;
-    newPos.second = pos.second + 1;
-    break;
-  case LEFT:
-    newPos.first = pos.first - 1;
-    newPos.second = pos.second;
-    break;
-  }
-
-  return newPos;
+  return (pos != 0) && ((pos & (pos - 1)) == 0);
 }
 
-BitBoard Board::putStone(int x, int y)
-{ 
-  if(x < 0 || BOARD_SIZE <= x ||
-     y < 0 || BOARD_SIZE <= y){
-    return 0;
-  }
-  
-  const BitBoard POS_BIT = (MSB_ONLY_64 >> (x + BOARD_SIZE * y));
-  BitBoard revPattern = 0;
-  
-  // 空白の位置にのみ石を置ける
-  if(((black | white) & POS_BIT) != 0){
-    return 0;
-  }
-
-  const BitBoard ME = (turn == BLACK ? black : white);
-  const BitBoard OPPONENT = (turn == BLACK ? white : black);
-
-  
-  for(int i = 0; i < NUM_DIRECTION; i++){    
-    BitBoard tmpRevPattern = 0;
-    BitBoard mask = transfer(POS_BIT, DIRS[i]);
-    // 相手の石が存在する間ループ
-    while(mask != 0 && (mask & OPPONENT) != 0) {
-        tmpRevPattern |= mask;
-        mask = transfer(mask, DIRS[i]);
-    }
-    // 上のループでたどった先に自分の石がなければひっくり返せない
-    if((mask & ME) != 0){
-      revPattern |= tmpRevPattern;
-    }
-  }
-
-  // 石の反転を適用
-  if(revPattern == 0){
-    return 0;
-  }else if(ME == black){
-    black ^= POS_BIT | revPattern;
-    white ^= revPattern;
-  }else{
-    white ^= POS_BIT | revPattern;
-    black ^= revPattern;
-  }
-
-  forwardUpdateCandList(x, y);
-  changeTurn();  
-  tesuu++;
-  return revPattern;
-}
-
-void Board::display() const
+BitBoard Board::xyToPos(int x, int y) const
 {
-  cout << "   ";
-  for(int i = 0; i < BOARD_SIZE; i++){
-    cout << i + 1 << " ";
-  }
-  cout << endl;
-  
-  for(int i = 0; i < BOARD_SIZE; i++){
-    cout << i + 1 << " |";
-    for(int j = 0; j < BOARD_SIZE; j++){
-      if(getState(j, i) == BLACK){
-	cout << "b";
-      }else if(getState(j, i) == WHITE){
-	cout << "w";
-      }else{
-	cout << " ";
-      }
-      cout << "|";
-    }
-    cout << endl;
-  }
-  cout << endl;
+  return (MSB_ONLY_64 >> (x + BOARD_SIZE * y));
 }
-
-void Board::undo(int x, int y, BitBoard revPattern)
-{
-  const BitBoard POS_BIT = (MSB_ONLY_64 >> (x + BOARD_SIZE * y));
-  const BitBoard OPPONENT = (turn == BLACK ? white : black);
-
-  if(OPPONENT == black){
-    black ^= POS_BIT | revPattern;
-    white ^= revPattern;
-  }else{
-    white ^= POS_BIT | revPattern;
-    black ^= revPattern;
-  }
-  
-  backUpdateCandList(x, y);
-  changeTurn();
-  tesuu--;
-}
-
-bool Board::canPut (int x, int y) const
-{
-  if(x < 0 || BOARD_SIZE <= x ||
-     y < 0 || BOARD_SIZE <= y){
-    return false;
-  }
-  
-  const BitBoard POS_BIT = (MSB_ONLY_64 >> (x + BOARD_SIZE * y));
-  
-  // 空白の位置にのみ石を置ける
-  if(((black | white) & POS_BIT) != 0){
-    return false;
-  }
-
-  const BitBoard ME = (turn == BLACK ? black : white);
-  const BitBoard OPPONENT = (turn == BLACK ? white : black);
-
-  
-  for(int i = 0; i < NUM_DIRECTION; i++){    
-    BitBoard tmpRevPattern = 0;
-    BitBoard mask = transfer(POS_BIT, DIRS[i]);
-    int oppStoneCount = 0;
-    // 相手の石が存在する間ループ
-    while(mask != 0 && (mask & OPPONENT) != 0) {
-        tmpRevPattern |= mask;
-        mask = transfer(mask, DIRS[i]);
-	oppStoneCount++;
-    }
-    /*
-      上のループでたどった先に自分の石があり、
-      かつひっくり返す石が１つでもあればO.K.
-    */
-    if((mask & ME) != 0 && oppStoneCount != 0){
-      return true;
-    }
-  }
-  
-  return false;
-}
-
-bool Board::isEnd() const
-{
-  for(list<std::pair<int, int> >::const_iterator itr = begin(candList);
-      itr != end(candList); itr++){
-    if(canPut(itr->first, itr->second)){
-      return false;
-    }
-  }
-  return true;
-}
-
-State_t Board::getWinner() const
-{
-  int blackCount = 0;
-  int whiteCount = 0;
-  for(int i = 0; i < BOARD_SIZE; i++){
-    for(int j = 0; j < BOARD_SIZE; j++){
-      if(getState(i, j) == BLACK){
-	blackCount++;
-      }else if(getState(i, j) == WHITE){
-	whiteCount++;
-      }
-    }
-  }
-  if(blackCount > whiteCount) return BLACK;
-  else if(blackCount == whiteCount) return SPACE;
-  else return WHITE;
-}
-
-bool Board::isPass() const
-{ 
-  for(list<std::pair<int, int> >::const_iterator itr = begin(candList);
-      itr != end(candList); itr++){
-    if(canPut(itr->first, itr->second)){
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool Board::operator==(const Board &obj) const
-{
-  if(black == obj.black && white == obj.white){
-    assert(tesuu == obj.tesuu);
-    assert(turn == obj.turn);
-    return true;
-  }else{
-    return false;
-  }
-}
-
-void Board::changeTurn()
-{
-  turn = (turn == BLACK ? WHITE : BLACK);
-}
-
-void Board::forwardUpdateCandList(int x, int y)
-{
-  assert(0 <= x && x < BOARD_SIZE &&
-	 0 <= y && y < BOARD_SIZE);
-  
-  pair<int, int> pos(x, y);
-  assert(find(begin(candList), end(candList), pos) != end(candList));
-  candList.erase(find(begin(candList), end(candList), pos));
-  
-  for(int i = 0; i < NUM_DIRECTION; i++){
-    pair<int, int> aroundPos = transfer(pos, DIRS[i]);
-    // 盤面からはみ出していたらダメ
-    if(aroundPos.first < 0 || BOARD_SIZE <= aroundPos.first ||
-	 aroundPos.second < 0 || BOARD_SIZE <= aroundPos.second){
-      continue;
-    }
-    // スペースかつリスト未登録であれば新規登録
-    if(getState(aroundPos.first, aroundPos.second) == SPACE &&
-       find(begin(candList), end(candList), aroundPos) == end(candList)){
-      candList.push_back(aroundPos);
-    }
-  }
-}
-
-void Board::backUpdateCandList(int x, int y)
-{
-  assert(0 <= x && x < BOARD_SIZE &&
-	 0 <= y && y < BOARD_SIZE);
-  
-  pair<int, int> pos(x, y);
-  candList.push_back(pos);
-
-  bool isErase = false;
-  for(list<pair<int, int> >::iterator itr = begin(candList);
-      itr != end(candList); itr++){
-    if(isErase){
-      itr--;
-    }
-    isErase = true;
-    for(int i = 0; i < NUM_DIRECTION; i++){
-      pair<int, int> aroundPos = transfer(pos, DIRS[i]);
-      // 盤面からはみ出していたらダメ
-      if(aroundPos.first < 0 || BOARD_SIZE <= aroundPos.first ||
-	 aroundPos.second < 0 || BOARD_SIZE <= aroundPos.second){
-	continue;
-      }
-      if(getState(aroundPos.first, aroundPos.second) != SPACE){
-	isErase = false;
-	break;
-      }      
-    }
-    if(isErase){
-      // 本当はremove_ifテンプレート等を使うべき
-      itr = candList.erase(itr);
-    }
-  }
-}
-
