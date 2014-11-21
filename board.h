@@ -7,13 +7,14 @@
 using std::list;
 using std::pair;
 
-typedef uint64_t BitBoard;
 typedef enum State{BLACK = -1, WHITE = 1, SPACE = 0} State_t;
 typedef enum Direction{LEFT_UP, UP, RIGHT_UP, RIGHT,
 		       RIGHT_DOWN, DOWN,
 		       LEFT_DOWN, LEFT} Direction_t;
+typedef uint64_t BitBoard;
 
 
+const BitBoard MSB_ONLY_64 = 0x8000000000000000;
 const int BOARD_SIZE = 8;
 const int NUM_CELL = 64;
 const int NUM_DIRECTION = 8;
@@ -21,7 +22,6 @@ const BitBoard INIT_BLACK = 0x0000000810000000;
 const BitBoard INIT_WHITE = 0x0000001008000000;
 const BitBoard LEFT_EDGE = 0x7f7f7f7f7f7f7f7f;
 const BitBoard RIGHT_EDGE = 0xfefefefefefefefe;
-const BitBoard MSB_ONLY_64 = 0x8000000000000000;
 const Direction_t DIRS[NUM_DIRECTION] = {LEFT_UP, UP, RIGHT_UP, RIGHT,
 					 RIGHT_DOWN, DOWN,
 					 LEFT_DOWN, LEFT};
@@ -75,9 +75,9 @@ class Board
   }
   bool operator==(const Board &obj) const;
 
-  BitBoard transfer(BitBoard oneBit, Direction d) const;
-  bool isValidPos(BitBoard pos) const;
-  BitBoard xyToPos(int x, int y) const;
+  static BitBoard transfer(BitBoard oneBit, Direction d);
+  static BitBoard xyToPos(int x, int y);
+  static pair<int, int> posToXY(BitBoard);
   
  private:
   BitBoard black;
@@ -88,5 +88,6 @@ class Board
   
   BitBoard getReversePattern(BitBoard pos);  
   void forwardUpdateCandList(BitBoard pos);
-  void backUpdateCandList(BitBoard pos);  
+  void backUpdateCandList(BitBoard pos);
+  bool isValidPos(BitBoard pos) const;  
 };

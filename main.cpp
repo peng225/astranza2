@@ -29,35 +29,36 @@ int main(int argc, char *argv[])
 
   board.display();
 
-  if(argc >= 2 && argv[1][0] == 'b'){
-    board.putStone(3, 2);
-    board.putStone(2, 2);
-    board.putStone(2, 3);
-    board.putStone(4, 2);
-    board.putStone(2, 1);
-    board.putStone(3, 5);
-    board.putStone(4, 1);
-    board.putStone(3, 1);
-    board.putStone(5, 2);
-    board.putStone(5, 3);
-    board.putStone(3, 0);
-    board.putStone(6, 2);
-    board.putStone(5, 4);
-    board.putStone(5, 5);
-    board.putStone(2, 5);
-    board.display();
+  // いつかここを直さないといけない
+  // if(argc >= 2 && argv[1][0] == 'b'){
+  //   board.putStone(3, 2);
+  //   board.putStone(2, 2);
+  //   board.putStone(2, 3);
+  //   board.putStone(4, 2);
+  //   board.putStone(2, 1);
+  //   board.putStone(3, 5);
+  //   board.putStone(4, 1);
+  //   board.putStone(3, 1);
+  //   board.putStone(5, 2);
+  //   board.putStone(5, 3);
+  //   board.putStone(3, 0);
+  //   board.putStone(6, 2);
+  //   board.putStone(5, 4);
+  //   board.putStone(5, 5);
+  //   board.putStone(2, 5);
+  //   board.display();
 
-    int loopNum = 6;
-    if(argc == 3){
-      loopNum = atoi(argv[2]);
-    }
+  //   int loopNum = 6;
+  //   if(argc == 3){
+  //     loopNum = atoi(argv[2]);
+  //   }
 
-    ai.setTime(INF);
-    for(int i = 0; i < loopNum; i++){
-      ai.search(board, 8);
-    }
-    return 0;
-  }
+  //   ai.setTime(INF);
+  //   for(int i = 0; i < loopNum; i++){
+  //     ai.search(board, 8);
+  //   }
+  //   return 0;
+  // }
 
   int history_no = 0;
   HIST_ENTRY *history = NULL;

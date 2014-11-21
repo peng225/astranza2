@@ -28,7 +28,7 @@ class Jouseki
   /** This function randomize the list of opening database.
    */  
  private:
-  vector<list<pair<int, int> > > jousekiList;
+  vector<list<BitBoard> > jousekiList;
   void randJousekiList();
 };
 

@@ -484,7 +484,8 @@ void AI::search(Board &board, int depth, bool is_itr)
     }
   }
   // 結果が確定していないnewInfoを使ってはいけない
-  std::cout << "x , y, score = " << info.x + 1 << ", " << info.y + 1 << ", "
+  pair<int, int> coord = Board::posToXY(info.pos);
+  std::cout << "x , y, score = " << coord.first + 1 << ", " << coord.second + 1 << ", "
 	    << info.score << std::endl;
   board.putStone(info.pos);
   return;

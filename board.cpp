@@ -14,7 +14,8 @@ void Board::init()
   tesuu = 1;
 
   candList.clear();
-  BitBoard pos = MSB_ONLY_64 >> (2 + 2 * BOARD_SIZE);
+  BitBoard pos = xyToPos(2, 2);
+  // BitBoard pos = MSB_ONLY_64 >> (2 + 2 * BOARD_SIZE);
   candList.push_back(pos);
   
   pos = transfer(pos, RIGHT);
@@ -120,7 +121,7 @@ State_t Board::getState(BitBoard pos) const
 
 BitBoard Board::putStone(BitBoard pos)
 { 
-  if(isValidPos(pos)){
+  if(!isValidPos(pos)){
     return 0;
   }
   
@@ -211,7 +212,7 @@ void Board::undo(BitBoard pos, BitBoard revPattern)
 
 bool Board::canPut (BitBoard pos) const
 {
-  if(isValidPos(pos)){
+  if(!isValidPos(pos)){
     return false;
   }   
   
@@ -356,7 +357,7 @@ void Board::backUpdateCandList(BitBoard pos)
   }
 }
 
-BitBoard Board::transfer(BitBoard oneBit, Direction d) const
+BitBoard Board::transfer(BitBoard oneBit, Direction d)
 {
   switch(d){
   case LEFT_UP:
@@ -385,7 +386,16 @@ bool Board::isValidPos(BitBoard pos) const
   return (pos != 0) && ((pos & (pos - 1)) == 0);
 }
 
-BitBoard Board::xyToPos(int x, int y) const
+BitBoard Board::xyToPos(int x, int y)
 {
   return (MSB_ONLY_64 >> (x + BOARD_SIZE * y));
+}
+
+pair<int, int> Board::posToXY(BitBoard pos)
+{
+  pair<int, int> coord;
+  int clz = __builtin_clzl(pos);
+  coord.first = clz % BOARD_SIZE;
+  coord.second = clz / BOARD_SIZE;
+  return coord;
 }

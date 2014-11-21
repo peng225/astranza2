@@ -69,7 +69,7 @@ double Pattern::evalFeature(const Board &board)
   // ty[0] = 3;
   int x = 3;
   int y = 7;
-  BitBoard pos = board.xyToPos(x, y);  
+  BitBoard pos = Board::xyToPos(x, y);  
   
   // for(int i = 1; i < 4; i++){
   //   tx[i] = tx[i - 1] + 1;
@@ -87,7 +87,7 @@ double Pattern::evalFeature(const Board &board)
       if(j != 3){
 	index *= 3;
       }
-      pos = board.transfer(pos, DIRS[i * 2]);
+      pos = Board::transfer(pos, DIRS[i * 2]);
     }
 
     score += weight[DIAG4_OFFSET + index];
@@ -96,7 +96,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y;
     x = BOARD_SIZE - 1 - oy;
     y = ox;
-    pos = board.xyToPos(x, y);
+    pos = Board::xyToPos(x, y);
     
     // for(int j = 0; j < 4; j++){
     //   ox = tx[j];
@@ -109,7 +109,7 @@ double Pattern::evalFeature(const Board &board)
   // diag5
   x = 4;
   y = 7;
-  pos = board.xyToPos(x, y);  
+  pos = Board::xyToPos(x, y);  
   // for(int i = 1; i < 5; i++){
   //   tx[i] = tx[i - 1] + 1;
   //   ty[i] = ty[i - 1] - 1;
@@ -121,7 +121,7 @@ double Pattern::evalFeature(const Board &board)
       if(j != 4){
 	index *= 3;
       }
-      pos = board.transfer(pos, DIRS[i * 2]);
+      pos = Board::transfer(pos, DIRS[i * 2]);
     }
     
     score += weight[DIAG5_OFFSET + index];
@@ -130,7 +130,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y;
     x = BOARD_SIZE - 1 - oy;
     y = ox;
-    pos = board.xyToPos(x, y);
+    pos = Board::xyToPos(x, y);
     // for(int j = 0; j < 5; j++){
     //   ox = tx[j];
     //   oy = ty[j];
@@ -144,7 +144,7 @@ double Pattern::evalFeature(const Board &board)
   // ty[0] = 5;
   x = 5;
   y = 7;
-  pos = board.xyToPos(x, y);
+  pos = Board::xyToPos(x, y);
   // for(int i = 1; i < 6; i++){
   //   tx[i] = tx[i - 1] + 1;
   //   ty[i] = ty[i - 1] - 1;
@@ -156,7 +156,7 @@ double Pattern::evalFeature(const Board &board)
       if(j != 5){
 	index *= 3;
       }
-      pos = board.transfer(pos, DIRS[i * 2]);
+      pos = Board::transfer(pos, DIRS[i * 2]);
     }
     score += weight[DIAG6_OFFSET + index];
 
@@ -164,7 +164,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y;
     x = BOARD_SIZE - 1 - oy;
     y = ox;
-    pos = board.xyToPos(x, y);
+    pos = Board::xyToPos(x, y);
     // for(int j = 0; j < 6; j++){
     //   ox = tx[j];
     //   oy = ty[j];
@@ -178,7 +178,7 @@ double Pattern::evalFeature(const Board &board)
   // ty[0] = 6;
   x = 6;
   y = 7;
-  pos = board.xyToPos(x, y);  
+  pos = Board::xyToPos(x, y);  
   // for(int i = 1; i < 7; i++){
   //   tx[i] = tx[i - 1] + 1;
   //   ty[i] = ty[i - 1] - 1;
@@ -190,7 +190,7 @@ double Pattern::evalFeature(const Board &board)
       if(j != 6){
 	index *= 3;
       }
-      pos = board.transfer(pos, DIRS[i * 2]);
+      pos = Board::transfer(pos, DIRS[i * 2]);
     }
     
     score += weight[DIAG7_OFFSET + index];
@@ -199,7 +199,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y;
     x = BOARD_SIZE - 1 - oy;
     y = ox;
-    pos = board.xyToPos(x, y);
+    pos = Board::xyToPos(x, y);
     // for(int j = 0; j < 7; j++){
     //   ox = tx[j];
     //   oy = ty[j];
@@ -213,7 +213,7 @@ double Pattern::evalFeature(const Board &board)
   // ty[0] = 7;
   x = 7;
   y = 7;
-  pos = board.xyToPos(x, y);  
+  pos = Board::xyToPos(x, y);  
   // for(int i = 1; i < 8; i++){    
   //   tx[i] = tx[i - 1] + 1;
   //   ty[i] = ty[i - 1] - 1;
@@ -225,7 +225,7 @@ double Pattern::evalFeature(const Board &board)
       if(j != 7){
 	index *= 3;
       }
-      pos = board.transfer(pos, DIRS[i * 2]);
+      pos = Board::transfer(pos, DIRS[i * 2]);
     }
     
     score += weight[DIAG8_OFFSET + index];
@@ -234,7 +234,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y;
     x = BOARD_SIZE - 1 - oy;
     y = ox;
-    pos = board.xyToPos(x, y);
+    pos = Board::xyToPos(x, y);
     // for(int j = 0; j < 8; j++){
     //   ox = tx[j];
     //   oy = ty[j];
@@ -252,7 +252,7 @@ double Pattern::evalFeature(const Board &board)
   int xy1 = 6;
   int xx2 = 1;
   int xy2 = 1; 
-  pos = board.xyToPos(x, y);  
+  pos = Board::xyToPos(x, y);  
   // for(int i = 1; i < 10; i++){
   //   if(i == 8){
   //     tx[i] = 1;
@@ -273,11 +273,11 @@ double Pattern::evalFeature(const Board &board)
 	index *= 3;
       }
       if(j < 7){
-	pos = board.transfer(pos, DIRS[i * 2 + 1]);
+	pos = Board::transfer(pos, DIRS[i * 2 + 1]);
       }else if(j == 7){
-	pos = board.xyToPos(xx1, xy1);
+	pos = Board::xyToPos(xx1, xy1);
       }else if(j == 8){
-	pos = board.xyToPos(xx2, xy2);
+	pos = Board::xyToPos(xx2, xy2);
       }
     }
     
@@ -287,7 +287,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y;
     x = BOARD_SIZE - 1 - oy;
     y = ox;
-    pos = board.xyToPos(x, y);
+    pos = Board::xyToPos(x, y);
 
     ox = xx1;
     oy = xy1;
@@ -315,7 +315,7 @@ double Pattern::evalFeature(const Board &board)
   int y1 = 7;
   int x2 = 2;
   int y2 = 7;
-  pos = board.xyToPos(x0, y0);  
+  pos = Board::xyToPos(x0, y0);  
   // for(int i = 1; i < 9; i++){
   //   if(i % 3 == 0){
   //     tx[i] = 0;
@@ -333,11 +333,11 @@ double Pattern::evalFeature(const Board &board)
 	index *= 3;
       }
       if(j == 2){
-	pos = board.xyToPos(x1, y1);
+	pos = Board::xyToPos(x1, y1);
       }else if(j == 5){
-	pos = board.xyToPos(x2, y2);
+	pos = Board::xyToPos(x2, y2);
       }else{
-	pos = board.transfer(pos, DIRS[i * 2 + 1]);
+	pos = Board::transfer(pos, DIRS[i * 2 + 1]);
       }
     }
     
@@ -347,7 +347,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y0;
     x0 = BOARD_SIZE - 1 - oy;
     y0 = ox;
-    pos = board.xyToPos(x0, y0);
+    pos = Board::xyToPos(x0, y0);
 
     ox = x1;
     oy = y1;
@@ -373,7 +373,7 @@ double Pattern::evalFeature(const Board &board)
   y0 = 7;
   x1 = 1;
   y1 = 7;
-  pos = board.xyToPos(x0, y0);
+  pos = Board::xyToPos(x0, y0);
   // for(int i = 1; i < 10; i++){
   //   if(i % 5 == 0){
   //     tx[i] = 0;
@@ -391,9 +391,9 @@ double Pattern::evalFeature(const Board &board)
 	index *= 3;
       }
       if(j == 4){
-	pos = board.xyToPos(x1, y1);
+	pos = Board::xyToPos(x1, y1);
       }else{
-	pos = board.transfer(pos, DIRS[i * 2 + 1]);
+	pos = Board::transfer(pos, DIRS[i * 2 + 1]);
       }
     }
     
@@ -403,7 +403,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y0;
     x0 = BOARD_SIZE - 1 - oy;
     y0 = ox;
-    pos = board.xyToPos(x0, y0);
+    pos = Board::xyToPos(x0, y0);
 
     ox = x1;
     oy = y1;
@@ -424,7 +424,7 @@ double Pattern::evalFeature(const Board &board)
   y0 = 7;
   x1 = 0;
   y1 = 6;
-  pos = board.xyToPos(x0, y0);
+  pos = Board::xyToPos(x0, y0);
   // for(int i = 1; i < 10; i++){
   //   if(i % 5 == 0){
   //     tx[i] = tx[i - 1] + 1;
@@ -443,10 +443,10 @@ double Pattern::evalFeature(const Board &board)
       }
 
       if(j == 4){
-	pos = board.xyToPos(x1, y1);
+	pos = Board::xyToPos(x1, y1);
       }else{
 	// (i * 2 + 3) % 8 == (i * 2 + 3) & 7 になる？？
-	pos = board.transfer(pos, DIRS[(i * 2 + 3) % 8]);
+	pos = Board::transfer(pos, DIRS[(i * 2 + 3) % 8]);
       }
     }
     
@@ -456,7 +456,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y0;
     x0 = BOARD_SIZE - 1 - oy;
     y0 = ox;
-    pos = board.xyToPos(x0, y0);
+    pos = Board::xyToPos(x0, y0);
 
     ox = x1;
     oy = y1;
@@ -475,7 +475,7 @@ double Pattern::evalFeature(const Board &board)
   // ty[0] = 1;
   x = 1;
   y = 7;
-  pos = board.xyToPos(x, y);
+  pos = Board::xyToPos(x, y);
   // for(int i = 1; i < 8; i++){
   //   tx[i] = tx[i - 1] + 1;
   //   ty[i] = ty[i - 1];
@@ -487,7 +487,7 @@ double Pattern::evalFeature(const Board &board)
       if(j != 7){
 	index *= 3;
       }
-      pos = board.transfer(pos, DIRS[i * 2 + 1]);
+      pos = Board::transfer(pos, DIRS[i * 2 + 1]);
     }
     score += weight[HOR2_OFFSET + index];
 
@@ -495,7 +495,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y;
     x = BOARD_SIZE - 1 - oy;
     y = ox;
-    pos = board.xyToPos(x, y);
+    pos = Board::xyToPos(x, y);
     // for(int j = 0; j < 8; j++){
     //   ox = tx[j];
     //   oy = ty[j];
@@ -509,7 +509,7 @@ double Pattern::evalFeature(const Board &board)
   // ty[0] = 2;
   x = 2;
   y = 7;
-  pos = board.xyToPos(x, y);
+  pos = Board::xyToPos(x, y);
   // for(int i = 1; i < 8; i++){
   //   tx[i] = tx[i - 1] + 1;
   //   ty[i] = ty[i - 1];
@@ -521,7 +521,7 @@ double Pattern::evalFeature(const Board &board)
       if(j != 7){
 	index *= 3;
       }
-      pos = board.transfer(pos, DIRS[i * 2 + 1]);
+      pos = Board::transfer(pos, DIRS[i * 2 + 1]);
     }
     
     score += weight[HOR3_OFFSET + index];
@@ -530,7 +530,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y;
     x = BOARD_SIZE - 1 - oy;
     y = ox;
-    pos = board.xyToPos(x, y);
+    pos = Board::xyToPos(x, y);
     // for(int j = 0; j < 8; j++){
     //   ox = tx[j];
     //   oy = ty[j];
@@ -544,7 +544,7 @@ double Pattern::evalFeature(const Board &board)
   // ty[0] = 3;
   x = 3;
   y = 7;
-  pos = board.xyToPos(x, y);
+  pos = Board::xyToPos(x, y);
   // for(int i = 1; i < 8; i++){
   //   tx[i] = tx[i - 1] + 1;
   //   ty[i] = ty[i - 1];
@@ -556,7 +556,7 @@ double Pattern::evalFeature(const Board &board)
       if(j != 7){
 	index *= 3;
       }
-      pos = board.transfer(pos, DIRS[i * 2 + 1]);
+      pos = Board::transfer(pos, DIRS[i * 2 + 1]);
     }
     
     score += weight[HOR4_OFFSET + index];
@@ -565,7 +565,7 @@ double Pattern::evalFeature(const Board &board)
     int oy = y;
     x = BOARD_SIZE - 1 - oy;
     y = ox;
-    pos = board.xyToPos(x, y);
+    pos = Board::xyToPos(x, y);
     // for(int j = 0; j < 8; j++){
     //   ox = tx[j];
     //   oy = ty[j];
@@ -583,17 +583,20 @@ void Pattern::extractFeatureIndices(const Board &board, std::vector<int> &indice
   int index;
 
   // diag4
-  tx[0] = 0;
-  ty[0] = 3;
-  for(int i = 1; i < 10; i++){
-    if(i >= 4){
-      tx[i] = 0;
-      ty[i] = 0;
-    }else{
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = ty[i - 1] - 1;
-    }
-  }
+  // tx[0] = 0;
+  // ty[0] = 3;
+  int x = 3;
+  int y = 7;
+  BitBoard pos = Board::xyToPos(x, y);  
+  // for(int i = 1; i < 10; i++){
+  //   if(i >= 4){
+  //     tx[i] = 0;
+  //     ty[i] = 0;
+  //   }else{
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = ty[i - 1] - 1;
+  //   }
+  // }
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 4; j++){
@@ -601,349 +604,357 @@ void Pattern::extractFeatureIndices(const Board &board, std::vector<int> &indice
       if(j != 3){
 	index *= 3;
       }
+      pos = Board::transfer(pos, DIRS[i * 2]);
     }
     
     indices.push_back(DIAG4_OFFSET + index);
-    for(int j = 0; j < 4; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
+
+    int ox = x;
+    int oy = y;
+    x = BOARD_SIZE - 1 - oy;
+    y = ox;
+    pos = Board::xyToPos(x, y);
+    
+    // for(int j = 0; j < 4; j++){
+    //   ox = tx[j];
+    //   oy = ty[j];
+    //   tx[j] = BOARD_SIZE - 1 - oy;
+    //   ty[j] = ox;
+    // }
   }
 
   // diag5
-  tx[0] = 0;
-  ty[0] = 4;
-  for(int i = 1; i < 10; i++){
-    if(i >= 5){
-      tx[i] = 0;
-      ty[i] = 0;
-    }else{
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = ty[i - 1] - 1;
-    }
-  }
-  for(int i = 0; i < NUM_SYMMETRY; i++){
-    index = 0;
-    for(int j = 0; j < 5; j++){
-      index += board.getState(pos) + 1;
-      if(j != 4){
-	index *= 3;
-      }
-    }
+  // tx[0] = 0;
+  // ty[0] = 4;
+  // for(int i = 1; i < 10; i++){
+  //   if(i >= 5){
+  //     tx[i] = 0;
+  //     ty[i] = 0;
+  //   }else{
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = ty[i - 1] - 1;
+  //   }
+  // }
+  // for(int i = 0; i < NUM_SYMMETRY; i++){
+  //   index = 0;
+  //   for(int j = 0; j < 5; j++){
+  //     index += board.getState(pos) + 1;
+  //     if(j != 4){
+  // 	index *= 3;
+  //     }
+  //   }
     
-    indices.push_back(DIAG5_OFFSET + index);
-    for(int j = 0; j < 5; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
-  }
+  //   indices.push_back(DIAG5_OFFSET + index);
+  //   for(int j = 0; j < 5; j++){
+  //     ox = tx[j];
+  //     oy = ty[j];
+  //     tx[j] = BOARD_SIZE - 1 - oy;
+  //     ty[j] = ox;
+  //   }
+  // }
   
-  // diag6
-  tx[0] = 0;
-  ty[0] = 5;
-  for(int i = 1; i < 10; i++){
-    if(i >= 6){
-      tx[i] = 0;
-      ty[i] = 0;
-    }else{
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = ty[i - 1] - 1;
-    }
-  }
-  for(int i = 0; i < NUM_SYMMETRY; i++){
-    index = 0;
-    for(int j = 0; j < 6; j++){
-      index += board.getState(pos) + 1;
-      if(j != 5){
-	index *= 3;
-      }
-    }
+  // // diag6
+  // tx[0] = 0;
+  // ty[0] = 5;
+  // for(int i = 1; i < 10; i++){
+  //   if(i >= 6){
+  //     tx[i] = 0;
+  //     ty[i] = 0;
+  //   }else{
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = ty[i - 1] - 1;
+  //   }
+  // }
+  // for(int i = 0; i < NUM_SYMMETRY; i++){
+  //   index = 0;
+  //   for(int j = 0; j < 6; j++){
+  //     index += board.getState(pos) + 1;
+  //     if(j != 5){
+  // 	index *= 3;
+  //     }
+  //   }
     
-    indices.push_back(DIAG6_OFFSET + index);
-    for(int j = 0; j < 6; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
-  }
+  //   indices.push_back(DIAG6_OFFSET + index);
+  //   for(int j = 0; j < 6; j++){
+  //     ox = tx[j];
+  //     oy = ty[j];
+  //     tx[j] = BOARD_SIZE - 1 - oy;
+  //     ty[j] = ox;
+  //   }
+  // }
   
-  // diag7
-  tx[0] = 0;
-  ty[0] = 6;
-  for(int i = 1; i < 10; i++){
-    if(i >= 7){
-      tx[i] = 0;
-      ty[i] = 0;
-    }else{
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = ty[i - 1] - 1;
-    }
-  }
-  for(int i = 0; i < NUM_SYMMETRY; i++){
-    index = 0;
-    for(int j = 0; j < 7; j++){
-      index += board.getState(pos) + 1;
-      if(j != 6){
-	index *= 3;
-      }
-    }
+  // // diag7
+  // tx[0] = 0;
+  // ty[0] = 6;
+  // for(int i = 1; i < 10; i++){
+  //   if(i >= 7){
+  //     tx[i] = 0;
+  //     ty[i] = 0;
+  //   }else{
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = ty[i - 1] - 1;
+  //   }
+  // }
+  // for(int i = 0; i < NUM_SYMMETRY; i++){
+  //   index = 0;
+  //   for(int j = 0; j < 7; j++){
+  //     index += board.getState(pos) + 1;
+  //     if(j != 6){
+  // 	index *= 3;
+  //     }
+  //   }
     
-    indices.push_back(DIAG7_OFFSET + index);
-    for(int j = 0; j < 7; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
-  }
+  //   indices.push_back(DIAG7_OFFSET + index);
+  //   for(int j = 0; j < 7; j++){
+  //     ox = tx[j];
+  //     oy = ty[j];
+  //     tx[j] = BOARD_SIZE - 1 - oy;
+  //     ty[j] = ox;
+  //   }
+  // }
 
-  // diag8
-  tx[0] = 0;
-  ty[0] = 7;
-  for(int i = 1; i < 10; i++){
-    if(i >= 8){
-      tx[i] = 0;
-      ty[i] = 0;
-    }else{
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = ty[i - 1] - 1;
-    }
-  }
-  for(int i = 0; i < NUM_SIMPLE_SYMMETRY; i++){
-    index = 0;
-    for(int j = 0; j < 8; j++){
-      index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
-    }
+  // // diag8
+  // tx[0] = 0;
+  // ty[0] = 7;
+  // for(int i = 1; i < 10; i++){
+  //   if(i >= 8){
+  //     tx[i] = 0;
+  //     ty[i] = 0;
+  //   }else{
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = ty[i - 1] - 1;
+  //   }
+  // }
+  // for(int i = 0; i < NUM_SIMPLE_SYMMETRY; i++){
+  //   index = 0;
+  //   for(int j = 0; j < 8; j++){
+  //     index += board.getState(pos) + 1;
+  //     if(j != 7){
+  // 	index *= 3;
+  //     }
+  //   }
     
-    indices.push_back(DIAG8_OFFSET + index);
-    for(int j = 0; j < 8; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
-  }
+  //   indices.push_back(DIAG8_OFFSET + index);
+  //   for(int j = 0; j < 8; j++){
+  //     ox = tx[j];
+  //     oy = ty[j];
+  //     tx[j] = BOARD_SIZE - 1 - oy;
+  //     ty[j] = ox;
+  //   }
+  // }
 
-  // edge2x
-  tx[0] = 0;
-  ty[0] = 0;
-  for(int i = 1; i < 10; i++){
-    if(i == 8){
-      tx[i] = 1;
-      ty[i] = 1;
-    }else if(i == 9){
-      tx[i] = 6;
-      ty[i] = 1;
-    }else{
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = ty[i - 1];
-    }
-  }
-  for(int i = 0; i < NUM_SYMMETRY; i++){
-    index = 0;
-    for(int j = 0; j < 10; j++){
-      index += board.getState(pos) + 1;
-      if(j != 9){
-	index *= 3;
-      }
-    }
+  // // edge2x
+  // tx[0] = 0;
+  // ty[0] = 0;
+  // for(int i = 1; i < 10; i++){
+  //   if(i == 8){
+  //     tx[i] = 1;
+  //     ty[i] = 1;
+  //   }else if(i == 9){
+  //     tx[i] = 6;
+  //     ty[i] = 1;
+  //   }else{
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = ty[i - 1];
+  //   }
+  // }
+  // for(int i = 0; i < NUM_SYMMETRY; i++){
+  //   index = 0;
+  //   for(int j = 0; j < 10; j++){
+  //     index += board.getState(pos) + 1;
+  //     if(j != 9){
+  // 	index *= 3;
+  //     }
+  //   }
     
-    indices.push_back(EDGE2X_OFFSET + index);
-    for(int j = 0; j < 10; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
-  }
+  //   indices.push_back(EDGE2X_OFFSET + index);
+  //   for(int j = 0; j < 10; j++){
+  //     ox = tx[j];
+  //     oy = ty[j];
+  //     tx[j] = BOARD_SIZE - 1 - oy;
+  //     ty[j] = ox;
+  //   }
+  // }
   
-  // corner
-  tx[0] = 0;
-  ty[0] = 0;
-  for(int i = 1; i < 10; i++){
-    if(i == 9){
-      tx[i] = 0;
-      ty[i] = 0;
-    }else if(i % 3 == 0){
-      tx[i] = 0;
-      ty[i] = ty[i - 1] + 1;
-    }else{
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = ty[i - 1];
-    }
-  }
-  for(int i = 0; i < NUM_SYMMETRY; i++){
-    index = 0;
-    for(int j = 0; j < 9; j++){
-      index += board.getState(pos) + 1;
-      if(j != 8){
-	index *= 3;
-      }
-    }
+  // // corner
+  // tx[0] = 0;
+  // ty[0] = 0;
+  // for(int i = 1; i < 10; i++){
+  //   if(i == 9){
+  //     tx[i] = 0;
+  //     ty[i] = 0;
+  //   }else if(i % 3 == 0){
+  //     tx[i] = 0;
+  //     ty[i] = ty[i - 1] + 1;
+  //   }else{
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = ty[i - 1];
+  //   }
+  // }
+  // for(int i = 0; i < NUM_SYMMETRY; i++){
+  //   index = 0;
+  //   for(int j = 0; j < 9; j++){
+  //     index += board.getState(pos) + 1;
+  //     if(j != 8){
+  // 	index *= 3;
+  //     }
+  //   }
 
-    indices.push_back(CORNER_OFFSET + index);
-    for(int j = 0; j < 9; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
-  }
+  //   indices.push_back(CORNER_OFFSET + index);
+  //   for(int j = 0; j < 9; j++){
+  //     ox = tx[j];
+  //     oy = ty[j];
+  //     tx[j] = BOARD_SIZE - 1 - oy;
+  //     ty[j] = ox;
+  //   }
+  // }
 
-  // rectangle
-  tx[0] = 0;
-  ty[0] = 0;
-  for(int i = 1; i < 10; i++){
-    if(i % 5 == 0){
-      tx[i] = 0;
-      ty[i] = ty[i - 1] + 1;
-    }else{
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = ty[i - 1];
-    }
-  }
-  for(int i = 0; i < NUM_SYMMETRY; i++){
-    index = 0;
-    for(int j = 0; j < 10; j++){
-      index += board.getState(pos) + 1;
-      if(j != 9){
-	index *= 3;
-      }
-    }
+  // // rectangle
+  // tx[0] = 0;
+  // ty[0] = 0;
+  // for(int i = 1; i < 10; i++){
+  //   if(i % 5 == 0){
+  //     tx[i] = 0;
+  //     ty[i] = ty[i - 1] + 1;
+  //   }else{
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = ty[i - 1];
+  //   }
+  // }
+  // for(int i = 0; i < NUM_SYMMETRY; i++){
+  //   index = 0;
+  //   for(int j = 0; j < 10; j++){
+  //     index += board.getState(pos) + 1;
+  //     if(j != 9){
+  // 	index *= 3;
+  //     }
+  //   }
     
-    indices.push_back(RECTAN_OFFSET + index);
-    for(int j = 0; j < 10; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
-  }
+  //   indices.push_back(RECTAN_OFFSET + index);
+  //   for(int j = 0; j < 10; j++){
+  //     ox = tx[j];
+  //     oy = ty[j];
+  //     tx[j] = BOARD_SIZE - 1 - oy;
+  //     ty[j] = ox;
+  //   }
+  // }
 
-  // rectangle(mirror)
-  tx[0] = 0;
-  ty[0] = 0;
-  for(int i = 1; i < 10; i++){
-    if(i % 5 == 0){
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = 0;
-    }else{
-      tx[i] = tx[i - 1];
-      ty[i] = ty[i - 1] + 1;
-    }
-  }
-  for(int i = 0; i < NUM_SYMMETRY; i++){
-    index = 0;
-    for(int j = 0; j < 10; j++){
-      index += board.getState(pos) + 1;
-      if(j != 9){
-	index *= 3;
-      }
-    }
+  // // rectangle(mirror)
+  // tx[0] = 0;
+  // ty[0] = 0;
+  // for(int i = 1; i < 10; i++){
+  //   if(i % 5 == 0){
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = 0;
+  //   }else{
+  //     tx[i] = tx[i - 1];
+  //     ty[i] = ty[i - 1] + 1;
+  //   }
+  // }
+  // for(int i = 0; i < NUM_SYMMETRY; i++){
+  //   index = 0;
+  //   for(int j = 0; j < 10; j++){
+  //     index += board.getState(pos) + 1;
+  //     if(j != 9){
+  // 	index *= 3;
+  //     }
+  //   }
     
-    indices.push_back(RECTAN_OFFSET + index);
-    for(int j = 0; j < 10; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
-  }
+  //   indices.push_back(RECTAN_OFFSET + index);
+  //   for(int j = 0; j < 10; j++){
+  //     ox = tx[j];
+  //     oy = ty[j];
+  //     tx[j] = BOARD_SIZE - 1 - oy;
+  //     ty[j] = ox;
+  //   }
+  // }
 
-  // horizon2
-  tx[0] = 0;
-  ty[0] = 1;
-  for(int i = 1; i < 10; i++){
-    if(i >= 8){
-      tx[i] = 0;
-      ty[i] = 0;
-    }else{
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = ty[i - 1];
-    }
-  }
-  for(int i = 0; i < NUM_SYMMETRY; i++){
-    index = 0;
-    for(int j = 0; j < 8; j++){
-      index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
-    }
-    indices.push_back(HOR2_OFFSET + index);
-    for(int j = 0; j < 8; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
-  }
+  // // horizon2
+  // tx[0] = 0;
+  // ty[0] = 1;
+  // for(int i = 1; i < 10; i++){
+  //   if(i >= 8){
+  //     tx[i] = 0;
+  //     ty[i] = 0;
+  //   }else{
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = ty[i - 1];
+  //   }
+  // }
+  // for(int i = 0; i < NUM_SYMMETRY; i++){
+  //   index = 0;
+  //   for(int j = 0; j < 8; j++){
+  //     index += board.getState(pos) + 1;
+  //     if(j != 7){
+  // 	index *= 3;
+  //     }
+  //   }
+  //   indices.push_back(HOR2_OFFSET + index);
+  //   for(int j = 0; j < 8; j++){
+  //     ox = tx[j];
+  //     oy = ty[j];
+  //     tx[j] = BOARD_SIZE - 1 - oy;
+  //     ty[j] = ox;
+  //   }
+  // }
 
-  // horizon3
-  tx[0] = 0;
-  ty[0] = 2;
-  for(int i = 1; i < 10; i++){
-    if(i >= 8){
-      tx[i] = 0;
-      ty[i] = 0;
-    }else{
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = ty[i - 1];
-    }
-  }
-  for(int i = 0; i < NUM_SYMMETRY; i++){
-    index = 0;
-    for(int j = 0; j < 8; j++){
-      index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
-    }
-    indices.push_back(HOR3_OFFSET + index);
-    for(int j = 0; j < 8; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
-  }
+  // // horizon3
+  // tx[0] = 0;
+  // ty[0] = 2;
+  // for(int i = 1; i < 10; i++){
+  //   if(i >= 8){
+  //     tx[i] = 0;
+  //     ty[i] = 0;
+  //   }else{
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = ty[i - 1];
+  //   }
+  // }
+  // for(int i = 0; i < NUM_SYMMETRY; i++){
+  //   index = 0;
+  //   for(int j = 0; j < 8; j++){
+  //     index += board.getState(pos) + 1;
+  //     if(j != 7){
+  // 	index *= 3;
+  //     }
+  //   }
+  //   indices.push_back(HOR3_OFFSET + index);
+  //   for(int j = 0; j < 8; j++){
+  //     ox = tx[j];
+  //     oy = ty[j];
+  //     tx[j] = BOARD_SIZE - 1 - oy;
+  //     ty[j] = ox;
+  //   }
+  // }
 
-  // horizon4
-  tx[0] = 0;
-  ty[0] = 3;
-  for(int i = 1; i < 10; i++){
-    if(i >= 8){
-      tx[i] = 0;
-      ty[i] = 0;
-    }else{
-      tx[i] = tx[i - 1] + 1;
-      ty[i] = ty[i - 1];
-    }
-  }
-  for(int i = 0; i < NUM_SYMMETRY; i++){
-    index = 0;
-    for(int j = 0; j < 8; j++){
-      index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
-    }
-    indices.push_back(HOR4_OFFSET + index);
-    for(int j = 0; j < 8; j++){
-      ox = tx[j];
-      oy = ty[j];
-      tx[j] = BOARD_SIZE - 1 - oy;
-      ty[j] = ox;
-    }
-  }
+  // // horizon4
+  // tx[0] = 0;
+  // ty[0] = 3;
+  // for(int i = 1; i < 10; i++){
+  //   if(i >= 8){
+  //     tx[i] = 0;
+  //     ty[i] = 0;
+  //   }else{
+  //     tx[i] = tx[i - 1] + 1;
+  //     ty[i] = ty[i - 1];
+  //   }
+  // }
+  // for(int i = 0; i < NUM_SYMMETRY; i++){
+  //   index = 0;
+  //   for(int j = 0; j < 8; j++){
+  //     index += board.getState(pos) + 1;
+  //     if(j != 7){
+  // 	index *= 3;
+  //     }
+  //   }
+  //   indices.push_back(HOR4_OFFSET + index);
+  //   for(int j = 0; j < 8; j++){
+  //     ox = tx[j];
+  //     oy = ty[j];
+  //     tx[j] = BOARD_SIZE - 1 - oy;
+  //     ty[j] = ox;
+  //   }
+  // }
 
 }
 

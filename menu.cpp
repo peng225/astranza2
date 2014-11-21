@@ -22,10 +22,11 @@ void put(Board &board, list<History> &hist, std::istream &ist){
   // 人間視点の座標をコンピュータ視点へ変換
   x--;
   y--;
+  BitBoard pos = Board::xyToPos(x, y);
 
   // BitBoard revPattern;  
   // if((revPattern = board.putStone(x, y)) == 0){
-  if(!board.putStone(x, y)){
+  if(!board.putStone(pos)){
     cout << "Illegal move!" << endl;
     putSuccess = false;
     hist.pop_back();
