@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
       cout << "Search time was changed to " << time << "." << endl;
     }
     else if(command == "learn" || command == "l"){
-      ln.learn("hoge", true);
+      ln.learn("hoge");
     }
     // else if(command == "generate" || command == "g") gen_kifu(*ist);
     else if(command == "init" || command == "i"){
