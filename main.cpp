@@ -17,8 +17,6 @@ using std::cerr;
 const int MAX_HISTORY_NUM = 100;
 const int DEFAULT_DEPTH = 6;
 
-// cand_listの初期化をしなければ・・・
-
 int main(int argc, char *argv[])
 {
   Board board;
@@ -30,35 +28,52 @@ int main(int argc, char *argv[])
   board.display();
 
   // いつかここを直さないといけない
-  // if(argc >= 2 && argv[1][0] == 'b'){
-  //   board.putStone(3, 2);
-  //   board.putStone(2, 2);
-  //   board.putStone(2, 3);
-  //   board.putStone(4, 2);
-  //   board.putStone(2, 1);
-  //   board.putStone(3, 5);
-  //   board.putStone(4, 1);
-  //   board.putStone(3, 1);
-  //   board.putStone(5, 2);
-  //   board.putStone(5, 3);
-  //   board.putStone(3, 0);
-  //   board.putStone(6, 2);
-  //   board.putStone(5, 4);
-  //   board.putStone(5, 5);
-  //   board.putStone(2, 5);
-  //   board.display();
+  if(argc >= 2 && argv[1][0] == 'b'){
+    BitBoard pos;
+    pos = Board::xyToPos(3, 2);
+    board.putStone(pos);
+    pos = Board::xyToPos(2, 2);
+    board.putStone(pos);
+    pos = Board::xyToPos(2, 3);
+    board.putStone(pos);
+    pos = Board::xyToPos(4, 2);
+    board.putStone(pos);
+    pos = Board::xyToPos(2, 1);
+    board.putStone(pos);
+    pos = Board::xyToPos(3, 5);
+    board.putStone(pos);
+    pos = Board::xyToPos(4, 1);
+    board.putStone(pos);
+    pos = Board::xyToPos(3, 1);
+    board.putStone(pos);
+    pos = Board::xyToPos(5, 2);
+    board.putStone(pos);
+    pos = Board::xyToPos(5, 3);
+    board.putStone(pos);
+    pos = Board::xyToPos(3, 0);
+    board.putStone(pos);
+    pos = Board::xyToPos(6, 2);
+    board.putStone(pos);
+    pos = Board::xyToPos(5, 4);
+    board.putStone(pos);
+    pos = Board::xyToPos(5, 5);
+    board.putStone(pos);
+    pos = Board::xyToPos(2, 5);
+    board.putStone(pos);
+    
+    board.display();
 
-  //   int loopNum = 6;
-  //   if(argc == 3){
-  //     loopNum = atoi(argv[2]);
-  //   }
+    int loopNum = 6;
+    if(argc == 3){
+      loopNum = atoi(argv[2]);
+    }
 
-  //   ai.setTime(INF);
-  //   for(int i = 0; i < loopNum; i++){
-  //     ai.search(board, 8);
-  //   }
-  //   return 0;
-  // }
+    ai.setTime(INF);
+    for(int i = 0; i < loopNum; i++){
+      ai.search(board, 8);
+    }
+    return 0;
+  }
 
   int history_no = 0;
   HIST_ENTRY *history = NULL;
@@ -89,7 +104,7 @@ int main(int argc, char *argv[])
       cout << "Search time was changed to " << time << "." << endl;
     }
     else if(command == "learn" || command == "l"){
-      ln.learn("hoge");
+      ln.learn("hoge", true);
     }
     // else if(command == "generate" || command == "g") gen_kifu(*ist);
     else if(command == "init" || command == "i"){
