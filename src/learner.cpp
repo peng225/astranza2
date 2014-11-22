@@ -85,7 +85,8 @@ void Learner::loadKifu()
 void Learner::learn(std::string filename, bool verbose)
 {
   list<int> cvalidIndices, ovalidIndices;  //特徴ベクトルが0ではないindices
-  AI ai;  //あんまりしっかり確認してないけど多分Search2でいいはず
+  AI ai;
+  Pattern pt;
   //棋譜ファイルを読み込む
   loadKifu();
 
@@ -119,13 +120,14 @@ void Learner::learn(std::string filename, bool verbose)
       revPattern = i->board.putStone(cpos);      
       //棋譜の手から深さ3or5の探索を行った局面の評価値を取得する
       DetailedMoveInfo cv;  //棋譜の手、評価値、末端局面を保持する
-      cv = ai.detailedNegascout(i->board, -INF, INF, h < REPEAT_NUM / 2 ? 3 : 5);
+      cv = ai.detailedNegascout(i->board, -INF, INF,
+				h < REPEAT_NUM / 2 ? 3 : 5, pt);
       cv.score *= -1;
       cv.pos = cpos;
       i->board.undo(cpos, revPattern);
       // double cmbsValue = -sc.eval(cv.ban, -turn).value;      
       if(verbose){
-	double cmbsValue = ai.detailedEval(cv.board).score;
+	double cmbsValue = ai.detailedEval(cv.board, pt).score;
 	std::cout << "correct value:" << cv.score << std::endl;
 	std::cout << "must be same:" << cmbsValue << std::endl;
 	assert(cv.score == cmbsValue || cv.score == -cmbsValue);
@@ -157,7 +159,8 @@ void Learner::learn(std::string filename, bool verbose)
 	  }
 	  //ここから深さ５の探索を行う
 	  DetailedMoveInfo ov;  //棋譜の手以外の情報を保持する
-	  ov = ai.detailedNegascout(i->board, -INF, INF, h < REPEAT_NUM / 2 ? 3 : 5);
+	  ov = ai.detailedNegascout(i->board, -INF, INF,
+				    h < REPEAT_NUM / 2 ? 3 : 5, pt);
 	  ov.score *= -1;
 	  // ov.x = j->first;
 	  // ov.y = j->second;
@@ -165,14 +168,14 @@ void Learner::learn(std::string filename, bool verbose)
 	  i->board.undo(*j, revPattern);
 	  // double ombsValue = -ai.eval(ov.ban, -turn).score;	  
 	  if(verbose){
-	    double ombsValue = ai.detailedEval(ov.board).score;
+	    // double ombsValue = ai.detailedEval(ov.board, pt).score;
 	    std::cout << "other value:" << ov.score << std::endl;
-	    std::cout << "must be same:" << ombsValue << std::endl;
-	    assert(ov.score == ombsValue || ov.score == -ombsValue);
+	    // std::cout << "must be same:" << ombsValue << std::endl;
+	    // assert(ov.score == ombsValue || ov.score == -ombsValue);
 	  }
 
 	  // 棋譜の手の方がスコアが低い場合、これを是正する
-	  if(cv.score < ov.score){	  
+	  if(cv.score <= ov.score){	  
 	    /*
 	      if(verbose){
 	      std::cout << "correct terminal situation:" << std::endl;
@@ -230,14 +233,17 @@ void Learner::learn(std::string filename, bool verbose)
 	      // cout << pt.getWeight(cvalidIndices.at(fnum)) << endl;
 	      // cout << LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)) << endl;
 	    }
-	    cv.score = ai.detailedEval(cv.board).score;
+	    cv.score = ai.detailedEval(cv.board, pt).score;
 	    if(verbose){
 	      std::cout << "new correct value:" << cv.score  << std::endl;
-	      std::cout << "new other value:" << ai.detailedEval(ov.board).score << std::endl;
+	      std::cout << "new other value:"
+			<< ai.detailedEval(ov.board, pt).score << std::endl;
 	      std::cout << std::endl;
 	    }
 	  }else{
-	    // cout << "skip" << endl;
+	    if(verbose){
+	      cout << "skip" << endl;
+	    }
 	  }
 	}
       }

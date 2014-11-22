@@ -36,22 +36,10 @@ MoveInfo AI::eval(const Board &board)
   return info;
 }
 
-DetailedMoveInfo AI::detailedEval(const Board &board)
+DetailedMoveInfo AI::detailedEval(const Board &board, const Pattern &lnPt)
 {
   DetailedMoveInfo info;
-  // if(board.isEnd()){
-  //   State_t winner = board.getWinner();
-  //   if(winner == board.getTurn()){
-  //     info.score = MAX_VALUE + pt.evalFeature(board);
-  //   }else if(winner == SPACE){
-  //     info.score = 0;
-  //   }else{
-  //     info.score = -MAX_VALUE + pt.evalFeature(board);
-  //   }
-  //   info.board = board;
-  //   return info;
-  // }
-  info.score = pt.evalFeature(board);
+  info.score = lnPt.evalFeature(board);
   info.board = board;
   return info;
 }
@@ -274,7 +262,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
   return info;
 }
 
-DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, int depth)
+DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, int depth, const Pattern &lnPt)
 {
   DetailedMoveInfo info; 
 
@@ -283,7 +271,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
   //リーフなら評価値を返す
   assert(depth >= 0);
   if(depth == 0 || board.isEnd()){
-    info = detailedEval(board);
+    info = detailedEval(board, lnPt);
     return info;
   }
 
@@ -301,7 +289,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
   if(availPos.size() == 0){
     assert(board.isPass());
     board.changeTurn();
-    info = detailedNegascout(board, -beta, -alpha, depth - 1); 
+    info = detailedNegascout(board, -beta, -alpha, depth - 1, lnPt); 
     info.score *= -1;
     // ここでもう一度turnを変えないと、呼び出し元でのturnがおかしくなる
     board.changeTurn();
@@ -347,7 +335,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
 
   revPattern = board.putStone(availPos.front());
   assert(revPattern != 0);
-  info = detailedNegascout(board, -beta, -alpha, depth - 1);
+  info = detailedNegascout(board, -beta, -alpha, depth - 1, lnPt);
   info.score *= -1;
   /*
     手を打つ度に盤面オブジェクトを作るのは非常にコストがかかるので、
@@ -389,7 +377,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
     revPattern = board.putStone(*itr);
     assert(revPattern != 0);
 
-    info = detailedNegascout(board, -alpha - 1, -alpha, depth - 1);
+    info = detailedNegascout(board, -alpha - 1, -alpha, depth - 1, lnPt);
     info.score *= -1;    
     
     if(beta <= info.score){
@@ -399,7 +387,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
       return info;
     }else if(alpha < info.score){
       alpha = info.score;
-      info = detailedNegascout(board, -beta, -alpha, depth - 1);
+      info = detailedNegascout(board, -beta, -alpha, depth - 1, lnPt);
       info.score *= -1;
       if(beta <= info.score){
 	// cout << "real beta cut" << endl;

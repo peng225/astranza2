@@ -45,7 +45,7 @@ class Pattern
   Pattern();
   void initWeight();
   void loadWeight(std::string wName);
-  double evalFeature(const Board &board);
+  double evalFeature(const Board &board) const;
   void setWeight(int i, double val)
   {
     weight[i] = val;

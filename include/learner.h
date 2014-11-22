@@ -44,7 +44,6 @@ class Learner
 {
  private:
   std::vector<CorrectMove> kyokumen;
-  Pattern pt;
   
  public:
   /** This function provides one of the supervised learning algorithm

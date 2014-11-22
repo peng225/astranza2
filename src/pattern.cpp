@@ -67,7 +67,7 @@ void Pattern::loadWeight(std::string wName)
 
 // パターンによる評価値を返す
 // 各特徴のインデックスを３進数を用いて表現している
-double Pattern::evalFeature(const Board &board)
+double Pattern::evalFeature(const Board &board) const
 {
   double score = 0;
   int index;

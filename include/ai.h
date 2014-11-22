@@ -120,7 +120,7 @@ class AI
 		     /* bool isOrdering = true, bool isProb = true, */
 		     /* int pcx = 0, int pcy = 0); */
 
-  DetailedMoveInfo detailedNegascout(Board &board, double alpha, double beta, int depth);
+  DetailedMoveInfo detailedNegascout(Board &board, double alpha, double beta, int depth, const Pattern& lnPt);
   
   //MoveInfo sc_jamboree(const spBan ban, int turn, int alpha, int beta, int depth, bool is_root = false);
   /** This function is intended to be used in actual game play.
@@ -132,7 +132,7 @@ class AI
    * or describes 5000 points to the usual return value.
    */
   MoveInfo eval(const Board &board);
-  DetailedMoveInfo detailedEval(const Board &board);
+  DetailedMoveInfo detailedEval(const Board &board, const Pattern &lnPt);
   
  private:
   Jouseki jouseki;
