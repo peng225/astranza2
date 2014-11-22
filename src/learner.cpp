@@ -122,8 +122,6 @@ void Learner::learn(std::string filename, bool verbose)
       cv = ai.detailedNegascout(i->board, -INF, INF, h < REPEAT_NUM / 2 ? 3 : 5);
       cv.score *= -1;
       cv.pos = cpos;
-      // cv.x = cx;
-      // cv.y = cy;
       i->board.undo(cpos, revPattern);
       // double cmbsValue = -sc.eval(cv.ban, -turn).value;      
       if(verbose){
