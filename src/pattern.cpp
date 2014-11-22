@@ -86,15 +86,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 4; j++){
-      // index += board.getState(tx[j], ty[j]) + 1;
+      index *= 3;
       index += board.getState(pos) + 1;
-      /*
-	ここのif文はindex *= 3をindex += ....の前に持っていけば消せる。
-	分岐予測ミスの削減により速くなる？？
-      */
-      if(j != 3){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2]);
     }
 
@@ -125,10 +118,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 5; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 4){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2]);
     }
     
@@ -160,10 +151,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 6; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 5){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2]);
     }
     score += weight[DIAG6_OFFSET + index];
@@ -194,10 +183,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 7; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 6){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2]);
     }
     
@@ -229,10 +216,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SIMPLE_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 8; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2]);
     }
     
@@ -276,10 +261,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 10; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 9){
-	index *= 3;
-      }
       if(j < 7){
 	pos = Board::transfer(pos, DIRS[i * 2 + 1]);
       }else if(j == 7){
@@ -336,10 +319,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 9; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 8){
-	index *= 3;
-      }
       if(j == 2){
 	pos = Board::xyToPos(x1, y1);
       }else if(j == 5){
@@ -394,10 +375,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 10; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 9){
-	index *= 3;
-      }
       if(j == 4){
 	pos = Board::xyToPos(x1, y1);
       }else{
@@ -445,10 +424,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 10; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 9){
-	index *= 3;
-      }
 
       if(j == 4){
 	pos = Board::xyToPos(x1, y1);
@@ -491,10 +468,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 8; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2 + 1]);
     }
     score += weight[HOR2_OFFSET + index];
@@ -525,10 +500,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 8; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2 + 1]);
     }
     
@@ -560,10 +533,8 @@ double Pattern::evalFeature(const Board &board) const
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 8; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2 + 1]);
     }
     
@@ -608,10 +579,8 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 4; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 3){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2]);
     }
     
@@ -642,10 +611,8 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 5; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 4){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2]);
     }
 
@@ -677,10 +644,8 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 6; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 5){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2]);
     }
 
@@ -712,10 +677,8 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 7; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 6){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2]);
     }
 
@@ -747,10 +710,8 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SIMPLE_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 8; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
       pos = Board::transfer(pos, DIRS[i * 2]);
     }
 
@@ -794,10 +755,9 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 10; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 9){
-	index *= 3;
-      }
+      
       if(j < 7){
 	pos = Board::transfer(pos, DIRS[i * 2 + 1]);
       }else if(j == 7){
@@ -854,10 +814,9 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 9; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 8){
-	index *= 3;
-      }
+
       if(j == 2){
 	pos = Board::xyToPos(x1, y1);
       }else if(j == 5){
@@ -912,10 +871,9 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 10; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 9){
-	index *= 3;
-      }
+
       if(j == 4){
 	pos = Board::xyToPos(x1, y1);
       }else{
@@ -963,10 +921,8 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 10; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 9){
-	index *= 3;
-      }
 
       if(j == 4){
 	pos = Board::xyToPos(x1, y1);
@@ -1009,10 +965,9 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 8; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
+
       pos = Board::transfer(pos, DIRS[i * 2 + 1]);
     }
 
@@ -1044,10 +999,9 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 8; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
+
       pos = Board::transfer(pos, DIRS[i * 2 + 1]);
     }
 
@@ -1079,10 +1033,9 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
   for(int i = 0; i < NUM_SYMMETRY; i++){
     index = 0;
     for(int j = 0; j < 8; j++){
+      index *= 3;
       index += board.getState(pos) + 1;
-      if(j != 7){
-	index *= 3;
-      }
+
       pos = Board::transfer(pos, DIRS[i * 2 + 1]);
     }
 
