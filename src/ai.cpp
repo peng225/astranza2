@@ -298,18 +298,19 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
   }
 
   // 浅い探索によるmove ordering
-  // ただし深さが小さい(具体的には2以下)ときは行わない
+  // ただし深さが小さい(具体的には3以下)ときは行わない
   // ただし反復深化によるmove orderingが優先
   if(depth >= THRESH_MOVE_ORDERING_DEPTH){  
     BitBoard revPattern;
-    MoveInfo moInfo;
+    DetailedMoveInfo dmoInfo;
     map<double, BitBoard> moveScore;
     for(list<BitBoard>::iterator i = begin(availPos);
 	i != end(availPos); i++){
       revPattern = board.putStone(*i);
       assert(revPattern != 0);
       // 浅い探索
-      moInfo = negascout(board, -beta, -alpha, 1);
+      dmoInfo = detailedNegascout(board, -beta, -alpha, 1, lnPt);
+      // dmoInfo = negascout(board, -beta, -alpha, 1);
       /*
 	ここではscoreに-1をかけない。
 	後でmapのキーでソートを行うが、
@@ -317,7 +318,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
 	あえて大小関係を逆にしておいた方がよいのである。
       */
       board.undo(*i, revPattern);
-      moveScore[moInfo.score] = *i;
+      moveScore[dmoInfo.score] = *i;
       // cout << i->first << ", " << i->second << endl;
     }
     
@@ -352,8 +353,6 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
     alpha = info.score;
   }
 
-  // MoveInfoが盤面情報を持つ必要ってあるのか？
-  // 学習に必要とか？
   double maxScore;
   int tPos = 0;
   Board tmpBoard;

@@ -105,10 +105,7 @@ void Learner::learn(std::string filename, bool verbose)
 	i->board.display();
       }
       int turn = i->board.getTurn();
-      BitBoard cpos;
-      cpos = i->correctPos;
-      // cx = i->correctPos.first;
-      // cy = i->correctPos.second;
+      BitBoard cpos = i->correctPos;
       std::string tlabel = (turn == BLACK ? "BLACK" : "WHITE");
       if(verbose){
 	std::cout << "turn:" << tlabel << std::endl;
@@ -121,7 +118,7 @@ void Learner::learn(std::string filename, bool verbose)
       //棋譜の手から深さ3or5の探索を行った局面の評価値を取得する
       DetailedMoveInfo cv;  //棋譜の手、評価値、末端局面を保持する
       cv = ai.detailedNegascout(i->board, -INF, INF,
-				h < REPEAT_NUM / 2 ? 3 : 5, pt);
+				h < (REPEAT_NUM >> 1) ? 3 : 5, pt);
       cv.score *= -1;
       cv.pos = cpos;
       i->board.undo(cpos, revPattern);
@@ -131,8 +128,7 @@ void Learner::learn(std::string filename, bool verbose)
 	std::cout << "correct value:" << cv.score << std::endl;
 	std::cout << "must be same:" << cmbsValue << std::endl;
 	assert(cv.score == cmbsValue || cv.score == -cmbsValue);
-      }      
-      if(verbose){
+
 	std::cout << "correct terminal situation:" << std::endl;
 	cv.board.display();
       }
@@ -160,13 +156,10 @@ void Learner::learn(std::string filename, bool verbose)
 	  //ここから深さ５の探索を行う
 	  DetailedMoveInfo ov;  //棋譜の手以外の情報を保持する
 	  ov = ai.detailedNegascout(i->board, -INF, INF,
-				    h < REPEAT_NUM / 2 ? 3 : 5, pt);
+				    h < (REPEAT_NUM >> 1) ? 3 : 5, pt);
 	  ov.score *= -1;
-	  // ov.x = j->first;
-	  // ov.y = j->second;
 	  ov.pos = *j;
 	  i->board.undo(*j, revPattern);
-	  // double ombsValue = -ai.eval(ov.ban, -turn).score;	  
 	  if(verbose){
 	    // double ombsValue = ai.detailedEval(ov.board, pt).score;
 	    std::cout << "other value:" << ov.score << std::endl;

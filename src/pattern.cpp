@@ -430,8 +430,8 @@ double Pattern::evalFeature(const Board &board) const
       if(j == 4){
 	pos = Board::xyToPos(x1, y1);
       }else{
-	// (i * 2 + 3) % 8 == (i * 2 + 3) & 7 になる？？
-	pos = Board::transfer(pos, DIRS[(i * 2 + 3) % 8]);
+	// (i * 2 + 3) % 8 == (i * 2 + 3) & 7
+	pos = Board::transfer(pos, DIRS[(i * 2 + 3) & 7]);
       }
     }
     
@@ -927,8 +927,8 @@ void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
       if(j == 4){
 	pos = Board::xyToPos(x1, y1);
       }else{
-	// (i * 2 + 3) % 8 == (i * 2 + 3) & 7 になる？？
-	pos = Board::transfer(pos, DIRS[(i * 2 + 3) % 8]);
+	// (i * 2 + 3) % 8 == (i * 2 + 3) & 7
+	pos = Board::transfer(pos, DIRS[(i * 2 + 3) & 7]);
       }
     }
 
