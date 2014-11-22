@@ -1,6 +1,5 @@
 #include "ai.h"
 #include <map>
-// #include <algorithm>
 
 using std::list;
 using std::map;
@@ -130,8 +129,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
   
 
   // 浅い探索によるmove ordering
-  // ただし深さが小さい(具体的には2以下)ときは行わない
-  // ただし反復深化によるmove orderingが優先
+  // ただし深さが小さい(具体的には3以下)ときは行わない
   if(depth >= THRESH_MOVE_ORDERING_DEPTH){  
     BitBoard revPattern;
     MoveInfo moInfo;
@@ -184,8 +182,6 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
     alpha = info.score;
   }
 
-  // MoveInfoが盤面情報を持つ必要ってあるのか？
-  // 学習に必要とか？
   double maxScore;
   BitBoard tPos = 0;
   
@@ -266,8 +262,6 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
 DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, int depth, const Pattern &lnPt)
 {
   DetailedMoveInfo info; 
-
-  numSearchNode++;
   
   //リーフなら評価値を返す
   assert(depth >= 0);
@@ -299,7 +293,6 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
 
   // 浅い探索によるmove ordering
   // ただし深さが小さい(具体的には3以下)ときは行わない
-  // ただし反復深化によるmove orderingが優先
   if(depth >= THRESH_MOVE_ORDERING_DEPTH){  
     BitBoard revPattern;
     DetailedMoveInfo dmoInfo;
@@ -310,7 +303,6 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
       assert(revPattern != 0);
       // 浅い探索
       dmoInfo = detailedNegascout(board, -beta, -alpha, 1, lnPt);
-      // dmoInfo = negascout(board, -beta, -alpha, 1);
       /*
 	ここではscoreに-1をかけない。
 	後でmapのキーでソートを行うが、
@@ -461,10 +453,7 @@ void AI::search(Board &board, int depth, bool is_itr)
       // 定石が使えなければ探索をする
       int tmpSt = st.searchTime;
       st.searchTime = INF;
-      // 恐らくこれが使いたいときはProbCutはしたくない
-      // info = negascout(board, turn, -INF, INF, depth, true, false);
       info = negascout(board, -INF, INF, depth);
-		       // , true, false);
       st.searchTime = tmpSt;
     }else{
       // 25手目未満かつ定石が使えればreturn
