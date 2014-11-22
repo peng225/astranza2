@@ -208,7 +208,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
     revPattern = board.putStone(*itr);
     assert(revPattern != 0);
 
-    info = negascout(board, -alpha - 1, -alpha, depth - 1);
+    info = negascout(board, -alpha - DELTA, -alpha, depth - 1);
     info.score *= -1;    
     
     if(beta <= info.score){
@@ -262,6 +262,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
   return info;
 }
 
+// 学習時に使用
 DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, int depth, const Pattern &lnPt)
 {
   DetailedMoveInfo info; 
@@ -377,7 +378,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
     revPattern = board.putStone(*itr);
     assert(revPattern != 0);
 
-    info = detailedNegascout(board, -alpha - 1, -alpha, depth - 1, lnPt);
+    info = detailedNegascout(board, -alpha - DELTA, -alpha, depth - 1, lnPt);
     info.score *= -1;    
     
     if(beta <= info.score){

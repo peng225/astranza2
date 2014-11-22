@@ -22,6 +22,7 @@ using std::next;
 const int INF = INT_MAX;
 const int DEFAULT_SEARCH_TIME = 1;
 const int MAX_VALUE = 50000;
+const double DELTA = 0.000001;  //微小量
 /* const double SCALE = 1.5; */
 
 const int THRESH_MOVE_ORDERING_DEPTH = 4;
@@ -36,7 +37,6 @@ const int THRESH_MOVE_ORDERING_DEPTH = 4;
 /* const double MARGIN9 = 7.58629 * SCALE; */
 /* const double MARGIN10 = 6.56639 * SCALE; */
 
-/* const double DELTA = 0.000001;  //微小量 */
 /* const int GRANULARITY = 7; */
 
 

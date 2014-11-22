@@ -190,6 +190,8 @@ void Board::display() const
     }
     cout << endl;
   }
+  cout << "black: " << __builtin_popcountl(black) << ", "
+       << "white: " << __builtin_popcountl(white) << endl;
   cout << endl;
 }
 
@@ -260,18 +262,18 @@ bool Board::isEnd() const
 
 State_t Board::getWinner() const
 {
-  int blackCount = 0;
-  int whiteCount = 0;
-  for(int i = 0; i < BOARD_SIZE; i++){
-    for(int j = 0; j < BOARD_SIZE; j++){
-      BitBoard pos = xyToPos(i, j);
-      if(getState(pos) == BLACK){
-	blackCount++;
-      }else if(getState(pos) == WHITE){
-	whiteCount++;
-      }
-    }
-  }
+  int blackCount = __builtin_popcountl(black);
+  int whiteCount = __builtin_popcountl(white);
+  // for(int i = 0; i < BOARD_SIZE; i++){
+  //   for(int j = 0; j < BOARD_SIZE; j++){
+  //     BitBoard pos = xyToPos(i, j);
+  //     if(getState(pos) == BLACK){
+  // 	blackCount++;
+  //     }else if(getState(pos) == WHITE){
+  // 	whiteCount++;
+  //     }
+  //   }
+  // }
   if(blackCount > whiteCount) return BLACK;
   else if(blackCount == whiteCount) return SPACE;
   else return WHITE;

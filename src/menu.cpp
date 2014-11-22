@@ -3,7 +3,19 @@
 void printWinner(const Board &board)
 {
   State_t winner = board.getWinner();
-  cout << (winner == BLACK ? "BLACK" : "WHITE") << " won." << endl;
+  switch(winner){
+  case BLACK:
+    cout << "BLACK won." << endl;
+    break;
+  case WHITE:
+    cout << "WHITE won." << endl;
+    break;
+  case SPACE:
+    cout << "Draw." << endl;
+    break;
+  default:
+    cout << "Bad winner data received." << endl;
+  }
 }
 
 void put(Board &board, list<History> &hist, std::istream &ist){
@@ -34,16 +46,17 @@ void put(Board &board, list<History> &hist, std::istream &ist){
   if(putSuccess){
     board.display();
 
+    // 終了処理
+    if(board.isEnd()){
+      printWinner(board);
+      return;
+    }
+
     // パスの処理
     if(board.isPass()){
       cout << (board.getTurn() == BLACK ? "BLACK" : "WHITE") << " PASS" << endl;
       board.changeTurn();
-    }
-
-    // 終了処理
-    if(board.isEnd()){
-      printWinner(board);
-    }
+    }    
   }
 
   
@@ -66,16 +79,18 @@ void search(Board &board, AI &ai, int depth, list<History> &hist)
     ai.search(board, depth);
     board.display();
 
+    // 終了処理
+    if(board.isEnd()){
+      printWinner(board);
+      return;
+    }
+
     // パスの処理
     if(board.isPass()){
       cout << (board.getTurn() == BLACK ? "BLACK" : "WHITE") << " PASS" << endl;
       board.changeTurn();
     }
-    
-    // 終了処理
-    if(board.isEnd()){
-      printWinner(board);
-    }
+        
   }
 }
 
