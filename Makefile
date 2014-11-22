@@ -1,40 +1,33 @@
 #Makefile
 
 
-# CFLAGS = -c -g -O3 -Wall -std=c++0x -flto -DNDEBUG
+# CFLAGS = -c -g -O3 -Wall -std=c++0x -flto -DNDEBUG -MMD -MP
 # FINAL_CFLAGS = -g -O3 -Wall -std=c++0x -flto -DNDEBUG
 
 CFLAGS := -c -g -O3 -Wall -std=c++0x -flto -MMD -MP
 FINAL_CFLAGS := -g -O3 -Wall -std=c++0x -flto
 
-# CFLAGS = -c -g -O0 -Wall -std=c++0x
+# CFLAGS = -c -g -O0 -Wall -std=c++0x -MMD -MP
 # FINAL_CFLAGS = -g -O0 -Wall -std=c++0x
 
-BINARY := astranza2
+TARGET := astranza2
 
 SRC_DIR := ./src
 OBJ_DIR := ./obj
-# DEP_DIR := ./dep
 
 SRCS = $(shell ls $(SRC_DIR)/*.cpp)
 OBJS = $(subst $(SRC_DIR), $(OBJ_DIR), $(SRCS:.cpp=.o))
 DEPS = $(OBJS:.o=.d)
 
-# SRCS := main.cpp board.cpp jouseki.cpp pattern.cpp ai.cpp history.cpp menu.cpp learner.cpp
-# OBJS := $(SRCS:%.cpp=%.o)
-# DEPS := $(SRCS:%.cpp=%.d)
-
 INCLUDE = -I ./include
 
-
 CC := g++
-# COMPILE = $(CC) $(CFLAGS) $(INCLUDE)
 
-all: $(BINARY)
+all: $(TARGET)
 
 -include $(DEPS)
 
-$(BINARY): $(OBJS)
+$(TARGET): $(OBJS)
 	$(CC) $(FINAL_CFLAGS) $(INCLUDE) -o $@ $^ -lreadline
 
 
@@ -71,6 +64,6 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 # board.o: board.h
 
 clean:
-	rm -f $(BINARY) $(OBJS) $(DEPS) $(SRC_DIR)/*~
+	rm -f $(TARGET) $(OBJS) $(DEPS) $(SRC_DIR)/*~
 
 .PHONY: all clean
