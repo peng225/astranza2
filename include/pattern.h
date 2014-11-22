@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include <vector>
+#include <list>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -54,7 +54,7 @@ class Pattern
   {
     return weight[i];
   }
-  void extractFeatureIndices(const Board &board, std::vector<int> &indices);
+  void extractFeatureIndices(const Board &board, list<int> &indices);
   /* void normalizeWeight(int norm); */
  private:
   double weight[FEATURE_NUM]; 

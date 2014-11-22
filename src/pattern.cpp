@@ -586,7 +586,7 @@ double Pattern::evalFeature(const Board &board)
 }
 
 // 盤面に現れる特徴のインデックスを取得
-void Pattern::extractFeatureIndices(const Board &board, std::vector<int> &indices)
+void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
 {
   int index;
 

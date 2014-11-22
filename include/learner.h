@@ -8,13 +8,16 @@
 
 const double LEARNING_RATE = 0.207;
 const double GAMMA = 0.0717;
-const int LOAD_KIFU_NUM = 26;
-const int REPEAT_NUM = 10;
+/* const int LOAD_KIFU_NUM = 260; */
+const int LOAD_KIFU_NUM = 2;
+/* const int REPEAT_NUM = 10; */
+const int REPEAT_NUM = 2;
 const double ACCURACY = 0.327;
 
 const int THRESH_NUM_CUTOFF_MOVE = 4;
 
 using std::vector;
+using std::list;
 using std::pair;
 
 //学習する重みは黒のためのもの。白の場合は符号を逆転して使う。

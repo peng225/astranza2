@@ -34,35 +34,6 @@ $(TARGET): $(OBJS)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $< 
 
-# %.o: %.c
-# 	$(CC) $(CFLAGS) $<
-
-# $(OBJ_DIR)/main.o: $(SRC_DIR)/main.cpp
-# 	$(COMPILE) -o $@ $<
-
-# $(OBJ_DIR)/board.o: $(SRC_DIR)/board.cpp
-# 	$(COMPILE) -o $@ $<
-
-# $(OBJ_DIR)/jouseki.o: $(SRC_DIR)/jouseki.cpp
-# 	$(COMPILE) -o $@ $<
-
-# $(OBJ_DIR)/pattern.o: $(SRC_DIR)/pattern.cpp
-# 	$(COMPILE) -o $@ $<
-
-# $(OBJ_DIR)/ai.o: $(SRC_DIR)/ai.cpp
-# 	$(COMPILE) -o $@ $<
-
-# $(OBJ_DIR)/history.o: $(SRC_DIR)/history.cpp
-# 	$(COMPILE) -o $@ $<
-
-# $(OBJ_DIR)/menu.o: $(SRC_DIR)/menu.cpp
-# 	$(COMPILE) -o $@ $<
-
-# $(OBJ_DIR)/learner.o: $(SRC_DIR)/learner.cpp
-# 	$(COMPILE) -o $@ $<
-
-# board.o: board.h
-
 clean:
 	rm -f $(TARGET) $(OBJS) $(DEPS) $(SRC_DIR)/*~
 

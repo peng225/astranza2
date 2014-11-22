@@ -84,7 +84,7 @@ void Learner::loadKifu()
 //Bonanza method
 void Learner::learn(std::string filename, bool verbose)
 {
-  vector<int> bkCvalidIndices, cvalidIndices, ovalidIndices;  //特徴ベクトルが0ではないindices
+  list<int> cvalidIndices, ovalidIndices;  //特徴ベクトルが0ではないindices
   AI ai;  //あんまりしっかり確認してないけど多分Search2でいいはず
   //棋譜ファイルを読み込む
   loadKifu();
@@ -138,19 +138,10 @@ void Learner::learn(std::string filename, bool verbose)
       }
       //棋譜の手から探索を行った末端局面の特徴ベクトルを抽出
       cvalidIndices.clear();
-      bkCvalidIndices.clear();
+      // bkCvalidIndices.clear();
       pt.extractFeatureIndices(cv.board, cvalidIndices);
-      bkCvalidIndices.assign(cvalidIndices.begin(), cvalidIndices.end());
-      /*for(int j = 0; j < (signed)cvalidIndices.size(); j++){
-	std::cout << cvalidIndices.at(j) << std::endl;
-       }
-       cv.ban->show_ban();*/
-      // int p;
-      //#pragma omp parallel for
-      //cvalidIndices, ovalidIndices, bkCvalidIndicesが外にいるからこのままではomp不可
-      //ここはcand_listを使って高速化可能
-      // for(p = 0; p < BOARD_SIZE; p++){
-      // 	for(int q = 0; q < BOARD_SIZE; q++){
+      // bkCvalidIndices.assign(cvalidIndices.begin(), cvalidIndices.end());
+      
       for(list<BitBoard>::const_iterator j = begin(i->candList);
 	  j != end(i->candList); j++){
 	//棋譜の手なら飛ばす
@@ -180,63 +171,75 @@ void Learner::learn(std::string filename, bool verbose)
 	    std::cout << "other value:" << ov.score << std::endl;
 	    std::cout << "must be same:" << ombsValue << std::endl;
 	    assert(ov.score == ombsValue || ov.score == -ombsValue);
-	  }	  
-	  /*
-	    if(verbose){
-	    std::cout << "correct terminal situation:" << std::endl;
-	    ov.ban->show_ban();
-	    }
-	  */
-	  double logistic;
-	  logistic = exp(-ACCURACY * (ov.score - cv.score));
-	  //その他の合法手の特徴ベクトルを抽出
-	  ovalidIndices.clear();
-	  pt.extractFeatureIndices(ov.board, ovalidIndices);
-	  //cvalidIndicesの値を復帰
-	  cvalidIndices.clear();
-	  cvalidIndices.assign(bkCvalidIndices.begin(), bkCvalidIndices.end());
-	  //cvalidIndicesとovalidIndicesで共通に現れる特徴はあらかじめはじいておく
-	  for(std::vector<int>::iterator citr = cvalidIndices.begin(); citr != cvalidIndices.end(); citr++){
-	    for(std::vector<int>::iterator oitr = ovalidIndices.begin(); oitr != ovalidIndices.end(); oitr++){
-	      if(*citr == *oitr){
-		cvalidIndices.erase(citr);
-		ovalidIndices.erase(oitr);
-		citr--;
-		break;
+	  }
+
+	  // 棋譜の手の方がスコアが低い場合、これを是正する
+	  if(cv.score < ov.score){	  
+	    /*
+	      if(verbose){
+	      std::cout << "correct terminal situation:" << std::endl;
+	      ov.ban->show_ban();
+	      }
+	    */
+	    double logistic;
+	    logistic = exp(-ACCURACY * (ov.score - cv.score));
+	    //その他の合法手の特徴ベクトルを抽出
+	    ovalidIndices.clear();
+	    pt.extractFeatureIndices(ov.board, ovalidIndices);
+	  
+	    //cvalidIndicesの値を復帰
+	    // cvalidIndices.clear();
+	    // cvalidIndices.assign(bkCvalidIndices.begin(), bkCvalidIndices.end());
+	  
+	    //cvalidIndicesとovalidIndicesで共通に現れる特徴はあらかじめはじいておく
+	    for(list<int>::iterator citr = cvalidIndices.begin(); citr != cvalidIndices.end(); citr++){
+	      for(list<int>::iterator oitr = ovalidIndices.begin(); oitr != ovalidIndices.end(); oitr++){
+		if(*citr == *oitr){
+		  cvalidIndices.erase(citr);
+		  ovalidIndices.erase(oitr);
+		  citr--;
+		  break;
+		}
 	      }
 	    }
-	  }
 
-	  for(int fnum = 0; fnum < (signed int)cvalidIndices.size(); fnum++){
-	    const double cw = pt.getWeight(cvalidIndices.at(fnum));
-	    //黒なら重みを大きくし、白なら小さくする
-	    assert((1 + logistic) * (1 + logistic) != 0);	    
-	    if(turn == BLACK){
-	      pt.setWeight(cvalidIndices.at(fnum), cw + LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)));
-	    }else{
-	      pt.setWeight(cvalidIndices.at(fnum), cw - LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)));
+	    // for(int fnum = 0; fnum < (signed int)cvalidIndices.size(); fnum++){
+	    for(list<int>::iterator itr = begin(cvalidIndices);
+		itr != end(cvalidIndices); itr++){
+	      const double cw = pt.getWeight(*itr);
+	      //黒なら重みを大きくし、白なら小さくする
+	      assert((1 + logistic) * (1 + logistic) != 0);	    
+	      if(turn == BLACK){
+		pt.setWeight(*itr, cw + LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)));
+	      }else{
+		pt.setWeight(*itr, cw - LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)));
+	      }
+	      // cout << pt.getWeight(cvalidIndices.at(fnum)) << endl;
+	      // cout << LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)) << endl;
 	    }
-	    // cout << pt.getWeight(cvalidIndices.at(fnum)) << endl;
-	    // cout << LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)) << endl;
-	  }
 
-	  for(int fnum = 0; fnum < (signed int)ovalidIndices.size(); fnum++){
-	    const double ow = pt.getWeight(ovalidIndices.at(fnum));
-	    //黒なら重みを小さくし、白なら大きくする
-	    assert((1 + logistic) * (1 + logistic) != 0);
-	    if(turn == BLACK){		    
-	      pt.setWeight(ovalidIndices.at(fnum), ow - LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic))); //pow(1 + logistic, 2));
-	    }else{
-	      pt.setWeight(ovalidIndices.at(fnum), ow + LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)));
+	    // for(int fnum = 0; fnum < (signed int)ovalidIndices.size(); fnum++){
+	    for(list<int>::iterator itr = begin(ovalidIndices);
+		itr != end(ovalidIndices); itr++){
+	      const double ow = pt.getWeight(*itr);
+	      //黒なら重みを小さくし、白なら大きくする
+	      assert((1 + logistic) * (1 + logistic) != 0);
+	      if(turn == BLACK){		    
+		pt.setWeight(*itr, ow - LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic))); //pow(1 + logistic, 2));
+	      }else{
+		pt.setWeight(*itr, ow + LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)));
+	      }
+	      // cout << pt.getWeight(cvalidIndices.at(fnum)) << endl;
+	      // cout << LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)) << endl;
 	    }
-	    // cout << pt.getWeight(cvalidIndices.at(fnum)) << endl;
-	    // cout << LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)) << endl;
-	  }
-	  cv.score = ai.detailedEval(cv.board).score;
-	  if(verbose){
-	    std::cout << "new correct value:" << cv.score  << std::endl;
-	    std::cout << "new other value:" << ai.detailedEval(ov.board).score << std::endl;
-	    std::cout << std::endl;
+	    cv.score = ai.detailedEval(cv.board).score;
+	    if(verbose){
+	      std::cout << "new correct value:" << cv.score  << std::endl;
+	      std::cout << "new other value:" << ai.detailedEval(ov.board).score << std::endl;
+	      std::cout << std::endl;
+	    }
+	  }else{
+	    // cout << "skip" << endl;
 	  }
 	}
       }
