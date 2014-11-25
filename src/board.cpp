@@ -401,3 +401,29 @@ pair<int, int> Board::posToXY(BitBoard pos)
   coord.second = clz / BOARD_SIZE;
   return coord;
 }
+
+// 要ユニットテスト
+BitBoard Board::getDoughnut(BitBoard pos) const
+{
+  assert(isValidPos(pos));
+  pair<int, int> coord = posToXY(pos);
+  coord.first--;
+  coord.second--;  
+
+  BitBoard doughnut = DOUGHNUT;
+  if(coord.first < 0){
+    doughnut = transfer(doughnut, LEFT);
+  }else{
+    for(int i = 0; i < coord.first; i++){
+      doughnut = transfer(doughnut, RIGHT);
+    }
+  }
+  
+  if(coord.second < 0){
+    doughnut = transfer(doughnut, UP);
+  }else{
+    for(int i = 0; i < coord.first; i++){
+      doughnut = transfer(doughnut, DOWN);
+    }
+  }
+}

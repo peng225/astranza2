@@ -22,6 +22,8 @@ const BitBoard INIT_BLACK = 0x0000000810000000;
 const BitBoard INIT_WHITE = 0x0000001008000000;
 const BitBoard LEFT_EDGE = 0x7f7f7f7f7f7f7f7f;
 const BitBoard RIGHT_EDGE = 0xfefefefefefefefe;
+const BitBoard DOUGHNUT = 0xe0e0e00000000000;
+
 const Direction_t DIRS[NUM_DIRECTION] = {LEFT_UP, UP, RIGHT_UP, RIGHT,
 					 RIGHT_DOWN, DOWN,
 					 LEFT_DOWN, LEFT};
@@ -86,8 +88,8 @@ class Board
   int tesuu;
   list<BitBoard> candList;
   
-  BitBoard getReversePattern(BitBoard pos);  
   void forwardUpdateCandList(BitBoard pos);
   void backUpdateCandList(BitBoard pos);
-  bool isValidPos(BitBoard pos) const;  
+  bool isValidPos(BitBoard pos) const;
+  BitBoard getDoughnut(BitBoard pos) const;
 };
