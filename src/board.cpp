@@ -330,33 +330,51 @@ void Board::forwardUpdateCandList(BitBoard pos)
 
 void Board::backUpdateCandList(BitBoard pos)
 {
-  assert(isValidPos(pos));
-  
-  candList.push_back(pos);
+  assert(isValidPos(pos));  
 
   bool isErase = false;
   for(list<BitBoard>::iterator itr = begin(candList);
-      itr != end(candList); itr++){
-    if(isErase){
-      itr--;
-    }
+      itr != end(candList); itr++){    
+    /*
+      ここではなくループの最後でitr--を実行すると、
+      0番目の要素を消したときに、
+      瞬間的にitrが-1番目の要素を指してしまう。
+    */
+    // cout << endl;
+    // cout << candList.size() << endl;
+    // cout << distance(begin(candList), itr) << endl;
     isErase = true;
-    for(int i = 0; i < NUM_DIRECTION; i++){
-      BitBoard aroundPos = transfer(pos, DIRS[i]);
+    // cout << "itr:" << endl;
+    // displayBitBoard(*itr);
+    assert(isValidPos(*itr));
+    // cout << "cand pos: " << posToXY(*itr).first << ", "
+    // 	 << posToXY(*itr).second << endl;    
+    for(int i = 0; i < NUM_DIRECTION; i++){      
+      BitBoard aroundPos = transfer(*itr, DIRS[i]);
+      // cout << "apos:" << endl;
+      // displayBitBoard(aroundPos);
+      // cout << "apos: " << posToXY(aroundPos).first << ", "
+      // 	   << posToXY(aroundPos).second << endl;
       // 盤面からはみ出していたらダメ
       if(!isValidPos(aroundPos)){
+	// cout << aroundPos << endl;
+	// cout << (aroundPos & (aroundPos - 1)) << endl;
+	assert(aroundPos == 0);
+	// cout << "hamidashi" << endl;
 	continue;
       }
       if(getState(aroundPos) != SPACE){
 	isErase = false;
 	break;
-      }      
+      }
     }
     if(isErase){
-      // 本当はremove_ifテンプレート等を使うべき
       itr = candList.erase(itr);
+      itr--;
     }
   }
+
+  candList.push_back(pos);
 }
 
 BitBoard Board::transfer(BitBoard oneBit, Direction d)
@@ -383,7 +401,7 @@ BitBoard Board::transfer(BitBoard oneBit, Direction d)
   }
 }
 
-bool Board::isValidPos(BitBoard pos) const
+bool Board::isValidPos(BitBoard pos) // const
 {
   return (pos != 0) && ((pos & (pos - 1)) == 0);
 }
@@ -395,6 +413,7 @@ BitBoard Board::xyToPos(int x, int y)
 
 pair<int, int> Board::posToXY(BitBoard pos)
 {
+  assert(isValidPos(pos));
   pair<int, int> coord;
   int clz = __builtin_clzl(pos);
   coord.first = clz % BOARD_SIZE;
@@ -403,27 +422,48 @@ pair<int, int> Board::posToXY(BitBoard pos)
 }
 
 // 要ユニットテスト
-BitBoard Board::getDoughnut(BitBoard pos) const
-{
-  assert(isValidPos(pos));
-  pair<int, int> coord = posToXY(pos);
-  coord.first--;
-  coord.second--;  
+// BitBoard Board::getDoughnut(BitBoard pos) const
+// {
+//   assert(isValidPos(pos));
+//   // XY座標に変換しなくても、先頭にならぶ0のビット数を数えたりすれば
+//   // シフト演算だけでいけるのでは？
+//   // さらに、ループ回してshift演算しなくても、
+//   // 一気にshiftしてしまうこともできるのでは？
+//   // その場合反対側に周りこんだビットの処理が面倒だけど、できそう。
+//   pair<int, int> coord = posToXY(pos);
+//   coord.first--;
+//   coord.second--;  
 
-  BitBoard doughnut = DOUGHNUT;
-  if(coord.first < 0){
-    doughnut = transfer(doughnut, LEFT);
-  }else{
-    for(int i = 0; i < coord.first; i++){
-      doughnut = transfer(doughnut, RIGHT);
-    }
-  }
+//   BitBoard doughnut = DOUGHNUT;
+//   if(coord.first < 0){
+//     doughnut = transfer(doughnut, LEFT);
+//   }else{
+//     for(int i = 0; i < coord.first; i++){
+//       doughnut = transfer(doughnut, RIGHT);
+//     }
+//   }
   
-  if(coord.second < 0){
-    doughnut = transfer(doughnut, UP);
-  }else{
-    for(int i = 0; i < coord.first; i++){
-      doughnut = transfer(doughnut, DOWN);
+//   if(coord.second < 0){
+//     doughnut = transfer(doughnut, UP);
+//   }else{
+//     for(int i = 0; i < coord.first; i++){
+//       doughnut = transfer(doughnut, DOWN);
+//     }
+//   }
+// }
+
+// 上下左右が反転して表示されるので注意
+void Board::displayBitBoard(BitBoard bb)
+{
+  BitBoard one = 1;
+  for(int i = 0; i < BOARD_SIZE; i++){
+    for(int j = 0; j < BOARD_SIZE; j++){
+      if(((one << ((BOARD_SIZE - i - 1) * BOARD_SIZE + (BOARD_SIZE - j - 1))) & bb) != 0){
+	cout << "1";
+      }else{
+	cout << "0";
+      }
     }
+    cout << endl;
   }
 }

@@ -184,16 +184,17 @@ void Learner::learn(std::string filename, bool verbose)
 	    //cvalidIndicesの値を復帰
 	    // cvalidIndices.clear();
 	    // cvalidIndices.assign(bkCvalidIndices.begin(), bkCvalidIndices.end());
-	  
+
+	    // bool erased = false;
 	    //cvalidIndicesとovalidIndicesで共通に現れる特徴はあらかじめはじいておく
 	    for(list<int>::iterator citr = cvalidIndices.begin(); citr != cvalidIndices.end(); citr++){
 	      for(list<int>::iterator oitr = ovalidIndices.begin(); oitr != ovalidIndices.end(); oitr++){
 		if(*citr == *oitr){
-		  cvalidIndices.erase(citr);
+		  citr = cvalidIndices.erase(citr);
 		  ovalidIndices.erase(oitr);
 		  citr--;
 		  break;
-		}
+		}		
 	      }
 	    }
 

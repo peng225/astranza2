@@ -9,7 +9,7 @@
 const double LEARNING_RATE = 0.207;
 const double GAMMA = 0.0717;
 /* const int LOAD_KIFU_NUM = 260; */
-const int LOAD_KIFU_NUM = 2;
+const int LOAD_KIFU_NUM = 1;
 /* const int REPEAT_NUM = 10; */
 const int REPEAT_NUM = 2;
 const double ACCURACY = 0.327;

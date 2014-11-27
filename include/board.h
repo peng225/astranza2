@@ -22,7 +22,7 @@ const BitBoard INIT_BLACK = 0x0000000810000000;
 const BitBoard INIT_WHITE = 0x0000001008000000;
 const BitBoard LEFT_EDGE = 0x7f7f7f7f7f7f7f7f;
 const BitBoard RIGHT_EDGE = 0xfefefefefefefefe;
-const BitBoard DOUGHNUT = 0xe0e0e00000000000;
+/* const BitBoard DOUGHNUT = 0xe0e0e00000000000; */
 
 const Direction_t DIRS[NUM_DIRECTION] = {LEFT_UP, UP, RIGHT_UP, RIGHT,
 					 RIGHT_DOWN, DOWN,
@@ -80,6 +80,7 @@ class Board
   static BitBoard transfer(BitBoard oneBit, Direction d);
   static BitBoard xyToPos(int x, int y);
   static pair<int, int> posToXY(BitBoard);
+  static void displayBitBoard(BitBoard bb);
   
  private:
   BitBoard black;
@@ -90,6 +91,6 @@ class Board
   
   void forwardUpdateCandList(BitBoard pos);
   void backUpdateCandList(BitBoard pos);
-  bool isValidPos(BitBoard pos) const;
-  BitBoard getDoughnut(BitBoard pos) const;
+  static bool isValidPos(BitBoard pos); /* const; */
+  /* BitBoard getDoughnut(BitBoard pos) const; */
 };
