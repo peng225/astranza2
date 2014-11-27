@@ -452,7 +452,6 @@ pair<int, int> Board::posToXY(BitBoard pos)
 //   }
 // }
 
-// 上下左右が反転して表示されるので注意
 void Board::displayBitBoard(BitBoard bb)
 {
   BitBoard one = 1;

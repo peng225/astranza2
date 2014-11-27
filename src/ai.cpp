@@ -270,6 +270,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
     return info;
   }
 
+  // これなしでも実装が可能なのでは？
   list<BitBoard> availPos;
   
   // List up all places where you can put a stone
