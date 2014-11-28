@@ -54,7 +54,7 @@ MoveInfo() : pos(0), score(0){}
 struct DetailedMoveInfo : public MoveInfo
 {
  public:
-  Board board;
+  LightBoard board;
 };
 
 /** You control the search time
@@ -132,7 +132,7 @@ class AI
    * or describes 5000 points to the usual return value.
    */
   MoveInfo eval(const Board &board);
-  DetailedMoveInfo detailedEval(const Board &board, const Pattern &lnPt);
+  DetailedMoveInfo detailedEval(const LightBoard &board, const Pattern &lnPt);
   
  private:
   Jouseki jouseki;

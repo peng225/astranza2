@@ -28,35 +28,20 @@ const Direction_t DIRS[NUM_DIRECTION] = {LEFT_UP, UP, RIGHT_UP, RIGHT,
 					 RIGHT_DOWN, DOWN,
 					 LEFT_DOWN, LEFT};
 
-/*******************************************
-                Error Codes
-********************************************/
-/* enum putStoneErrCode{OUT_OF_RANGE, NONSENSE_VALUE}; */
-
-
-class Board
+class LightBoard
 {
  public:
- Board() : black(INIT_BLACK), white(INIT_WHITE), turn(BLACK), tesuu(1)
+  LightBoard() : black(INIT_BLACK), white(INIT_WHITE), turn(BLACK), tesuu(1)
     {
-      init();
-    };
-  void init();
-  State_t getState(BitBoard pos) const;
-  BitBoard putStone(BitBoard pos);
-  void undo(BitBoard pos, BitBoard revPattern);
+    };  
+  State_t getState(BitBoard pos) const;    
   /** Check if you can put a stone on (x, y). */
-  bool canPut (BitBoard pos) const;
-  /** Check if the game is over or not. */
-  bool isEnd() const;
+  bool canPut (BitBoard pos) const;  
   /** If the player whose turn is "turn" wins, return 1.
    * else if draw, return 0.
    * else return -1.
    */
-  State_t getWinner() const;
-  /** Check if the player whose turn is "turn" must pass or not. */
-  bool isPass() const;
-  std::list<BitBoard>& getCl(){return candList;}
+  State_t getWinner() const;  
   void display() const;
   State_t getTurn() const
   {
@@ -75,22 +60,43 @@ class Board
   {
     return white;
   }
-  bool operator==(const Board &obj) const;
+  bool operator==(const LightBoard &obj) const;
 
   static BitBoard transfer(BitBoard oneBit, Direction d);
   static BitBoard xyToPos(int x, int y);
   static pair<int, int> posToXY(BitBoard);
   static void displayBitBoard(BitBoard bb);
-  
- private:
+  static bool isValidPos(BitBoard pos);
+ protected:
   BitBoard black;
   BitBoard white;
   State_t turn;
-  int tesuu;
+  int tesuu;  
+};
+
+class Board : public LightBoard
+{
+ public:
+  Board()
+    {
+      init();
+    }
+  void init();
+  BitBoard putStone(BitBoard pos);
+  void undo(BitBoard pos, BitBoard revPattern);
+  /** Check if the game is over or not. */
+  bool isEnd() const;
+  /** Check if the player whose turn is "turn" must pass or not. */
+  bool isPass() const;
+  list<BitBoard>& getCl()
+    {
+      return candList;
+    }
+  bool operator==(const Board &obj) const;
+ private:
   list<BitBoard> candList;
   
   void forwardUpdateCandList(BitBoard pos);
-  void backUpdateCandList(BitBoard pos);
-  static bool isValidPos(BitBoard pos); /* const; */
+  void backUpdateCandList(BitBoard pos);  
   /* BitBoard getDoughnut(BitBoard pos) const; */
 };

@@ -124,10 +124,10 @@ void Learner::learn(std::string filename, bool verbose)
       i->board.undo(cpos, revPattern);
       // double cmbsValue = -sc.eval(cv.ban, -turn).value;      
       if(verbose){
-	double cmbsValue = ai.detailedEval(cv.board, pt).score;
+	// double cmbsValue = ai.detailedEval(cv.board, pt).score;
 	std::cout << "correct value:" << cv.score << std::endl;
-	std::cout << "must be same:" << cmbsValue << std::endl;
-	assert(cv.score == cmbsValue || cv.score == -cmbsValue);
+	// std::cout << "must be same:" << cmbsValue << std::endl;
+	// assert(cv.score == cmbsValue || cv.score == -cmbsValue);
 
 	std::cout << "correct terminal situation:" << std::endl;
 	cv.board.display();

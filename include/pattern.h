@@ -45,7 +45,7 @@ class Pattern
   Pattern();
   void initWeight();
   void loadWeight(std::string wName);
-  double evalFeature(const Board &board) const;
+  double evalFeature(const LightBoard &board) const;
   void setWeight(int i, double val)
   {
     weight[i] = val;
@@ -54,7 +54,7 @@ class Pattern
   {
     return weight[i];
   }
-  void extractFeatureIndices(const Board &board, list<int> &indices);
+  void extractFeatureIndices(const LightBoard &board, list<int> &indices);
   /* void normalizeWeight(int norm); */
  private:
   double weight[FEATURE_NUM]; 

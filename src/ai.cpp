@@ -35,7 +35,7 @@ MoveInfo AI::eval(const Board &board)
   return info;
 }
 
-DetailedMoveInfo AI::detailedEval(const Board &board, const Pattern &lnPt)
+DetailedMoveInfo AI::detailedEval(const LightBoard &board, const Pattern &lnPt)
 {
   DetailedMoveInfo info;
   info.score = lnPt.evalFeature(board);
@@ -348,7 +348,7 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
 
   double maxScore;
   int tPos = 0;
-  Board tmpBoard;
+  LightBoard tmpBoard;
   
   maxScore = info.score;
   tmpBoard = info.board;

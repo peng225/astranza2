@@ -67,7 +67,7 @@ void Pattern::loadWeight(std::string wName)
 
 // パターンによる評価値を返す
 // 各特徴のインデックスを３進数を用いて表現している
-double Pattern::evalFeature(const Board &board) const
+double Pattern::evalFeature(const LightBoard &board) const
 {
   double score = 0;
   int index;
@@ -557,7 +557,7 @@ double Pattern::evalFeature(const Board &board) const
 }
 
 // 盤面に現れる特徴のインデックスを取得
-void Pattern::extractFeatureIndices(const Board &board, list<int> &indices)
+void Pattern::extractFeatureIndices(const LightBoard &board, list<int> &indices)
 {
   int index;
 
