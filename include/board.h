@@ -28,6 +28,12 @@ const Direction_t DIRS[NUM_DIRECTION] = {LEFT_UP, UP, RIGHT_UP, RIGHT,
 					 RIGHT_DOWN, DOWN,
 					 LEFT_DOWN, LEFT};
 
+/*
+  このクラスにcandListを入れないようにすることで、
+  学習アルゴリズムで末端の盤面情報を吸い上げる際に、
+  余計なmallocをたくさん呼ばずに済む。
+*/
+
 class LightBoard
 {
  public:
