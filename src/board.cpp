@@ -413,11 +413,20 @@ bool Board::operator==(const Board &obj) const
 }
 
 void Board::forwardUpdateCandList(BitBoard pos)
-{  
-  assert(isValidPos(pos));  
-  assert(find(begin(candList), end(candList), pos) != end(candList));
+{
+  // cout << "f before" << endl;
+  // displayCandListPos();
+  assert(isValidPos(pos));
+  list<BitBoard>::iterator posItr = find(begin(candList), end(candList), pos);
+  assert(posItr != end(candList));
   
-  candList.erase(find(begin(candList), end(candList), pos));
+  posItr = candList.erase(posItr);
+
+  pair<int, int> clDiff;
+  // candListから消された場所が元々candListの何番目にいたかという情報を取得
+  clDiff.first = distance(begin(candList), posItr);
+
+  int addCount = 0;
   
   for(int i = 0; i < NUM_DIRECTION; i++){
     BitBoard aroundPos = transfer(pos, DIRS[i]);
@@ -428,56 +437,77 @@ void Board::forwardUpdateCandList(BitBoard pos)
     // スペースかつリスト未登録であれば新規登録
     if(getState(aroundPos) == SPACE &&
        find(begin(candList), end(candList), aroundPos) == end(candList)){
-      candList.push_back(aroundPos);
+      posItr = candList.insert(posItr, aroundPos);
+      posItr++;
+      addCount++;
+      // candList.push_back(aroundPos);
     }
   }
+  // 新たにいくつの要素をcandListに追加したかという情報
+  clDiff.second = addCount;
+  candListDiffs.push(clDiff);
+
+  // cout << "f after" << endl;
+  // displayCandListPos();
 }
 
 void Board::backUpdateCandList(BitBoard pos)
 {
+  // cout << "b before" << endl;
+  // displayCandListPos();
   assert(isValidPos(pos));  
 
-  bool isErase = false;
-  for(list<BitBoard>::iterator itr = begin(candList);
-      itr != end(candList); itr++){    
-    /*
-      ここではなくループの最後でitr--を実行すると、
-      0番目の要素を消したときに、
-      瞬間的にitrが-1番目の要素を指してしまう。
-    */
-    // cout << endl;
-    // cout << candList.size() << endl;
-    // cout << distance(begin(candList), itr) << endl;
-    isErase = true;
-    // cout << "itr:" << endl;
-    // displayBitBoard(*itr);
-    assert(isValidPos(*itr));
-    // cout << "cand pos: " << posToXY(*itr).first << ", "
-    // 	 << posToXY(*itr).second << endl;    
-    for(int i = 0; i < NUM_DIRECTION; i++){      
-      BitBoard aroundPos = transfer(*itr, DIRS[i]);
-      // cout << "apos:" << endl;
-      // displayBitBoard(aroundPos);
-      // cout << "apos: " << posToXY(aroundPos).first << ", "
-      // 	   << posToXY(aroundPos).second << endl;
-      // 盤面からはみ出していたらダメ
-      if(!isValidPos(aroundPos)){
-	// cout << aroundPos << endl;
-	// cout << (aroundPos & (aroundPos - 1)) << endl;
-	assert(aroundPos == 0);
-	// cout << "hamidashi" << endl;
-	continue;
-      }
-      if(getState(aroundPos) != SPACE){
-	isErase = false;
-	break;
-      }
-    }
-    if(isErase){
-      itr = candList.erase(itr);
-      itr--;
-    }
+  pair<int, int> clDiff = candListDiffs.top();
+  candListDiffs.pop();
+  list<BitBoard>::iterator posItr = begin(candList);
+
+  for(int i = 0; i < clDiff.first; i++){
+    posItr++;
   }
 
-  candList.push_back(pos);
+  for(int i = 0; i < clDiff.second; i++){
+    posItr = candList.erase(posItr);
+  }
+
+  candList.insert(posItr, pos);  
+
+  // bool erased = false;
+  // for(list<BitBoard>::iterator itr = begin(candList);
+  //     itr != end(candList); itr++){    
+  //   erased = true;
+  //   assert(isValidPos(*itr));
+  //   for(int i = 0; i < NUM_DIRECTION; i++){      
+  //     BitBoard aroundPos = transfer(*itr, DIRS[i]);
+  //     // 盤面からはみ出していたらダメ
+  //     if(!isValidPos(aroundPos)){
+  // 	assert(aroundPos == 0);
+  // 	continue;
+  //     }
+  //     if(getState(aroundPos) != SPACE){
+  // 	erased = false;
+  // 	break;
+  //     }
+  //   }
+  //   if(erased){
+  //     itr = candList.erase(itr);
+  //     itr--;
+  //   }
+  // }
+
+  // candList.push_back(pos);
+
+  
+  // cout << "b after" << endl;
+  // displayCandListPos();
+}
+
+void Board::displayCandListPos()
+{
+  BitBoard bb = (BitBoard)0;
+
+  for(list<BitBoard>::iterator itr = begin(candList);
+      itr != end(candList); itr++){
+    bb |= *itr;
+  }
+  displayBitBoard(bb);
 }

@@ -2,9 +2,11 @@
 
 #include <stdint.h>
 #include <list>
+#include <stack>
 #include <algorithm>
 
 using std::list;
+using std::stack;
 using std::pair;
 
 typedef enum State{BLACK = -1, WHITE = 1, SPACE = 0} State_t;
@@ -99,10 +101,20 @@ class Board : public LightBoard
       return candList;
     }
   bool operator==(const Board &obj) const;
+  bool emptyCandListDiffs() const
+  {
+    return candListDiffs.empty();
+  }
+  stack<pair<int, int> >& getCandListDiffs()
+  {
+    return candListDiffs;
+  }
  private:
   list<BitBoard> candList;
+  stack<pair<int, int> > candListDiffs;
   
   void forwardUpdateCandList(BitBoard pos);
   void backUpdateCandList(BitBoard pos);  
   /* BitBoard getDoughnut(BitBoard pos) const; */
+  void displayCandListPos();
 };
