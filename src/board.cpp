@@ -98,7 +98,7 @@ void LightBoard::display() const
   cout << endl;
 }
 
-bool LightBoard::canPut (BitBoard pos) const
+bool LightBoard::canPut (BitBoard pos, bool opponent) const
 {
   if(!isValidPos(pos)){
     return false;
@@ -109,8 +109,16 @@ bool LightBoard::canPut (BitBoard pos) const
     return false;
   }
 
-  const BitBoard ME = (turn == BLACK ? black : white);
-  const BitBoard OPPONENT = (turn == BLACK ? white : black);
+  BitBoard ME;
+  BitBoard OPPONENT;
+
+  if(!opponent){
+    ME = (turn == BLACK ? black : white);
+    OPPONENT = (turn == BLACK ? white : black);
+  }else{
+    OPPONENT = (turn == BLACK ? black : white);
+    ME = (turn == BLACK ? white : black);
+  }
 
   
   for(int i = 0; i < NUM_DIRECTION; i++){    
@@ -389,6 +397,12 @@ bool Board::isEnd() const
   for(list<BitBoard>::const_iterator itr = begin(candList);
       itr != end(candList); itr++){
     if(canPut(*itr)){
+      return false;
+    }
+  }
+  for(list<BitBoard>::const_iterator itr = begin(candList);
+      itr != end(candList); itr++){
+    if(canPut(*itr, true)){
       return false;
     }
   }

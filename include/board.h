@@ -44,7 +44,7 @@ class LightBoard
     };  
   State_t getState(BitBoard pos) const;    
   /** Check if you can put a stone on (x, y). */
-  bool canPut (BitBoard pos) const;  
+  bool canPut (BitBoard pos, bool opponent = false) const;  
   /** If the player whose turn is "turn" wins, return 1.
    * else if draw, return 0.
    * else return -1.
