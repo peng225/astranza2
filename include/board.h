@@ -90,7 +90,7 @@ class Board : public LightBoard
       init();
     }
   void init();
-  BitBoard putStone(BitBoard pos);
+  BitBoard putStone(BitBoard pos, bool clearClds = false);
   void undo(BitBoard pos, BitBoard revPattern);
   /** Check if the game is over or not. */
   bool isEnd() const;

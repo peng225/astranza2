@@ -49,7 +49,7 @@ void Learner::loadKifu()
       //最初の数手はいらない
       if(count < THRESH_NUM_CUTOFF_MOVE){
 	//banを一手ずつ進めていく
-	board.putStone(pos);
+	board.putStone(pos, true);
 	count++;
 	continue;
       }
@@ -63,7 +63,7 @@ void Learner::loadKifu()
       kyokumen.push_back(CorrectMove(tboard, tboard.getCl(), pos));
       //banを一手ずつ進めていく
       //パスなら手順を入れ替えてやり直し
-      if(!board.putStone(pos)){
+      if(!board.putStone(pos, true)){
 	assert(board.isEnd());
 	kyokumen.pop_back();
       }

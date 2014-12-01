@@ -101,7 +101,7 @@ bool Jouseki::useJouseki(Board &board)
     // 現在の手数の手前まで移動
     for(std::list<BitBoard>::iterator j = begin(*i);
 	count < board.getTesuu() - 1; j++){
-      tmpBoard.putStone(*j);
+      tmpBoard.putStone(*j, true);
       count++;
     }
     // 定石ファイルに同じ盤面が存在すれば使う
@@ -111,7 +111,7 @@ bool Jouseki::useJouseki(Board &board)
       for(int j = 0; j < count; j++){
 	itr++;
       }
-      board.putStone(*itr);
+      board.putStone(*itr, true);
       pair<int, int> coord = Board::posToXY(*itr);
       std::cout << coord.first + 1 << ", " << coord.second + 1 << std::endl;
       return true;

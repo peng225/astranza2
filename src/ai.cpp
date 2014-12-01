@@ -465,6 +465,6 @@ void AI::search(Board &board, int depth, bool is_itr)
   pair<int, int> coord = Board::posToXY(info.pos);
   std::cout << "x , y, score = " << coord.first + 1 << ", " << coord.second + 1 << ", "
 	    << info.score << std::endl;
-  board.putStone(info.pos);
+  board.putStone(info.pos, true);
   return;
 }

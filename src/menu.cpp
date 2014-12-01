@@ -38,7 +38,7 @@ void put(Board &board, list<History> &hist, std::istream &ist){
 
   // BitBoard revPattern;  
   // if((revPattern = board.putStone(x, y)) == 0){
-  if(!board.putStone(pos)){
+  if(!board.putStone(pos, true)){
     cout << "Illegal move!" << endl;
     putSuccess = false;
     hist.pop_back();

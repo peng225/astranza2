@@ -313,7 +313,7 @@ void Board::init()
   // }
 }
 
-BitBoard Board::putStone(BitBoard pos)
+BitBoard Board::putStone(BitBoard pos, bool clearClds)
 { 
   if(!isValidPos(pos)){
     return 0;
@@ -358,6 +358,12 @@ BitBoard Board::putStone(BitBoard pos)
   forwardUpdateCandList(pos);
   changeTurn();  
   tesuu++;
+
+  if(clearClds){
+    candListDiffs.pop();
+    assert(candListDiffs.empty());
+  }
+  
   return revPattern;
 }
 
