@@ -256,4 +256,6 @@ void Learner::learn(std::string filename, bool verbose)
   for(int i = 0; i < FEATURE_NUM; i++){
     ofs << pt.getWeight(i) << std::endl;
   }
+
+  kyokumen.clear();
 }
