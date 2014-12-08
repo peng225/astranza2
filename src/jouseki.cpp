@@ -91,7 +91,7 @@ void Jouseki::readJousekiFile(string filename)
   randJousekiList();
 }
 
-bool Jouseki::useJouseki(Board &board)
+BitBoard Jouseki::useJouseki(Board &board)
 {
   for(vector<list<BitBoard> >::iterator i = begin(jousekiList);
       i != end(jousekiList); i++){
@@ -114,10 +114,10 @@ bool Jouseki::useJouseki(Board &board)
       board.putStone(*itr, true);
       pair<int, int> coord = Board::posToXY(*itr);
       std::cout << coord.first + 1 << ", " << coord.second + 1 << std::endl;
-      return true;
+      return *itr;
     }
   }
-  return false;
+  return 0;
 }
 
 void Jouseki::randJousekiList()

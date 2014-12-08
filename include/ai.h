@@ -22,7 +22,7 @@ using std::next;
 const int INF = INT_MAX;
 const int DEFAULT_SEARCH_TIME = 1;
 const int MAX_VALUE = 50000;
-const double DELTA = 0.000001;  //微小量
+const double DELTA = 0.00001;  //微小量
 /* const double SCALE = 1.5; */
 
 const int THRESH_MOVE_ORDERING_DEPTH = 4;
@@ -129,7 +129,7 @@ class AI
   /** This function is intended to be used in actual game play.
    * If "is_itr" is true, the iteretive deepning algorithm runs.
    */
-  void search(Board &board, int depth);
+  BitBoard search(Board &board, int depth);
   /** This function calculates the leaf value.
    * If the winner is decided, this function adds
    * or describes 5000 points to the usual return value.

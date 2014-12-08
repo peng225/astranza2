@@ -18,10 +18,7 @@ void printWinner(const Board &board)
   }
 }
 
-void put(Board &board, list<History> &hist, std::istream &ist){
-  // history
-  hist.push_back(History(board));
-
+void put(Board &board, list<History> &hist, std::istream &ist){  
   int x = 0, y = 0;
   bool putSuccess = true;
   if(board.getTurn() == BLACK){
@@ -35,6 +32,10 @@ void put(Board &board, list<History> &hist, std::istream &ist){
   x--;
   y--;
   BitBoard pos = Board::xyToPos(x, y);
+  assert(Board::isValidPos(pos));
+
+  // history
+  hist.push_back(History(board, pos));
 
   // BitBoard revPattern;  
   // if((revPattern = board.putStone(x, y)) == 0){
@@ -66,8 +67,7 @@ void put(Board &board, list<History> &hist, std::istream &ist){
 
 void search(Board &board, AI &ai, int depth, list<History> &hist)
 {
-  //history
-  hist.push_back(History(board));
+  Board oldBoard = board;  
 
   if(board.getTurn() == BLACK){
     std::cout << "Turn:BLACK" << std::endl;
@@ -76,7 +76,10 @@ void search(Board &board, AI &ai, int depth, list<History> &hist)
   }
   
   if(!board.isEnd()){
-    ai.search(board, depth);
+    BitBoard pos = 0;
+    pos = ai.search(board, depth);
+    assert(Board::isValidPos(pos));
+    hist.push_back(History(oldBoard, pos));
     board.display();
 
     // 終了処理
@@ -118,5 +121,22 @@ void undo(Board &board, list<History> &hist)
     }
   }else{
     cout << "No history exists." << endl;
+  }
+}
+
+void outputKifu(list<History> &hist)
+{
+
+  string filename = "";
+  cout << "filename: " << std::flush;
+  cin >> filename;
+  
+  std::ofstream ofs(filename);
+  
+  for(list<History>::iterator itr = begin(hist);
+      itr != end(hist); itr++){
+    ofs << Board::posToXY(itr->getPos()).first + 1 << " "
+	<< Board::posToXY(itr->getPos()).second + 1
+	<< endl;
   }
 }

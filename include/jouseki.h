@@ -24,7 +24,7 @@ class Jouseki
 { 
  public:
   void readJousekiFile(string filename = DEFAULT_JOUSEKI_FILENAME);
-  bool useJouseki(Board &board);
+  BitBoard useJouseki(Board &board);
   void randJousekiList();
   /** This function randomize the list of opening database.
    */  

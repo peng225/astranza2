@@ -135,7 +135,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
     if(bs.depth >= depth && bs.turn == board.getTurn()){
       info.pos = bs.pos;
       info.score = bs.score;
-      std::cout << "Hash hit!" << std::endl;
+      // std::cout << "Hash hit!" << std::endl;
       return info;
     }
   }
@@ -184,7 +184,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
   //     info.y = 0;
   //     //std::cout << "prob cut b" << std::endl;
   //     return v;
-  //   }
+  //   }b
   //   v = negascout(ban, turn, alpha - margin[index], alpha - margin[index] + DELTA, shallow[index], true, false);
   //   if(info.value <= alpha - margin[index]){
   //     info.x = 0;
@@ -198,7 +198,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
 
   // 浅い探索によるmove ordering
   // ただし深さが小さい(具体的には3以下)ときは行わない
-  if(depth >= THRESH_MOVE_ORDERING_DEPTH){  
+  if(depth >= THRESH_MOVE_ORDERING_DEPTH){
     BitBoard revPattern;
     MoveInfo moInfo;
     map<double, BitBoard> moveScore;
@@ -273,7 +273,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
     assert(revPattern != 0);
 
     info = negascout(board, -alpha - DELTA, -alpha, depth - 1, true);
-    info.score *= -1;    
+    info.score *= -1;
     
     if(beta <= info.score){
       board.undo(*itr, revPattern);
@@ -472,7 +472,7 @@ AI::AI()
   jouseki.readJousekiFile();
 }
 
-void AI::search(Board &board, int depth)
+BitBoard AI::search(Board &board, int depth)
 {
   MoveInfo info, newInfo;
   numSearchNode = 0;
@@ -482,7 +482,8 @@ void AI::search(Board &board, int depth)
   // 相手番で終わるようにしないと水平線効果でおかしな評価値になる
   for(int i = 2; i <= depth; i += 2){
     // 定石が24手までしかないからだっけ？
-    if(board.getTesuu() >= 25 || !jouseki.useJouseki(board)){
+    BitBoard pos;
+    if(board.getTesuu() >= 25 || (pos = jouseki.useJouseki(board)) == 0){
       // 25手目以上ならば探索をする
       // 定石が使えなければ探索をする
       // 前の深さでの探索の結果をmove orderingに利用
@@ -490,7 +491,7 @@ void AI::search(Board &board, int depth)
     }else{
       // 25手目未満かつ定石が使えればreturn
       // 定石が使えるのに反復深化しても意味ないよね
-      return;
+      return pos;
     }
     if(((double)clock() - st.start) / (double)CLOCKS_PER_SEC >= st.searchTime){
       // タイムオーバーならbreak
@@ -508,5 +509,5 @@ void AI::search(Board &board, int depth)
   std::cout << "x , y, score = " << coord.first + 1 << ", " << coord.second + 1 << ", "
 	    << info.score << std::endl;
   board.putStone(info.pos, true);
-  return;
+  return info.pos;
 }
