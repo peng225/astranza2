@@ -135,7 +135,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
     if(bs.depth >= depth && bs.turn == board.getTurn()){
       info.pos = bs.pos;
       info.score = bs.score;
-      // std::cout << "Hash hit!" << std::endl;
+      std::cout << "Hash hit!" << std::endl;
       return info;
     }
   }
@@ -309,7 +309,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
   //枝刈りされなかったときはここに来るのでよいのだが、
   //全ての子ノードの探索結果がα値を下回っていたときにもここに来るよなぁ
   //どっちにしても返すのは変数maxScoreの値なので、問題ないかな
-  if(depth < HASH_REGISTER_DEPTH ||
+  if(nullWindowSearch || depth < HASH_REGISTER_DEPTH ||
      (double)((int)clock() - st.start) /
      (double)CLOCKS_PER_SEC >= st.searchTime){
     ; //Do nothing
