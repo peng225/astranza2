@@ -43,12 +43,80 @@ DetailedMoveInfo AI::detailedEval(const LightBoard &board, const Pattern &lnPt)
   return info;
 }
 
+// デバッグ用
+
+MoveInfo AI::minimax(Board &board, int depth)
+{
+  MoveInfo info;      
+
+  //タイムオーバーなら探索打ち切り
+  if((double)((int)clock() - st.start) / (double)CLOCKS_PER_SEC
+     >= st.searchTime){
+    info.pos = 0;
+    return info;
+  }
+
+  numSearchNode++;
+  
+  //リーフなら評価値を返す
+  assert(depth >= 0);
+  if(depth == 0 || board.isEnd()){
+    info = eval(board);
+    return info;
+  }
+
+  list<BitBoard> availPos;
+  
+  // List up all places where you can put a stone
+  for(list<BitBoard>::const_iterator itr = begin(board.getCl()); 
+      itr != end(board.getCl()); itr++){
+    if(board.canPut(*itr)){
+      availPos.push_back(*itr);      
+    }
+  }
+  
+  // 置く場所がなかったらパス
+  if(availPos.size() == 0){
+    assert(board.isPass());
+    board.changeTurn();
+    info = minimax(board, depth - 1); 
+    info.score *= -1;
+    // ここでもう一度turnを変えないと、呼び出し元でのturnがおかしくなる
+    board.changeTurn();
+    return info;
+  }
+    
+
+  double maxScore;
+  BitBoard tPos = 0;
+  
+  maxScore = -INF;
+
+  BitBoard revPattern;
+  
+  for(list<BitBoard>::const_iterator itr = begin(availPos);
+      itr != end(availPos); itr++){    
+    revPattern = board.putStone(*itr);
+    info = minimax(board, depth - 1);
+    info.score *= -1;
+    if(maxScore < info.score){      
+      maxScore = info.score;
+      tPos = *itr;
+    }
+
+    board.undo(*itr, revPattern);
+  }
+  
+  info.pos = tPos;
+  info.score = maxScore;  
+  return info;
+}
+
 
 // NegaScout
 // 主にプレイ時に使用
-MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
-		       // bool isOrdering, bool isProb,
-		       // int pcx, int pcy)
+MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
+		       bool nullWindowSearch)
 {
   MoveInfo info;      
 
@@ -62,7 +130,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
   numSearchNode++;
 
   // ハッシュにヒットしてたらそこで探索おしまい
-  if(bh.find(board) != end(bh)){
+  if(!nullWindowSearch && bh.find(board) != end(bh)){
     BoardState bs = bh.at(board);
     if(bs.depth >= depth && bs.turn == board.getTurn()){
       info.pos = bs.pos;
@@ -204,7 +272,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
     revPattern = board.putStone(*itr);
     assert(revPattern != 0);
 
-    info = negascout(board, -alpha - DELTA, -alpha, depth - 1);
+    info = negascout(board, -alpha - DELTA, -alpha, depth - 1, true);
     info.score *= -1;    
     
     if(beta <= info.score){
@@ -241,7 +309,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth)
   //枝刈りされなかったときはここに来るのでよいのだが、
   //全ての子ノードの探索結果がα値を下回っていたときにもここに来るよなぁ
   //どっちにしても返すのは変数maxScoreの値なので、問題ないかな
-  if(depth < 5 ||
+  if(depth < HASH_REGISTER_DEPTH ||
      (double)((int)clock() - st.start) /
      (double)CLOCKS_PER_SEC >= st.searchTime){
     ; //Do nothing
@@ -357,15 +425,6 @@ DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, 
   
   for(list<BitBoard>::const_iterator itr = next(begin(availPos));
       itr != end(availPos); itr++){
-    // // Put a stone on the child node.
-    // revPattern = board.putStone(itr->first, itr->second);
-    // assert(revPattern != 0);
-    // info = negascout(board, -beta, -alpha, depth - 1);
-    // info.score *= -1;
-    // board.undo(itr->first, itr->second, revPattern);
-
-    
-
     // Null Window Search
     revPattern = board.putStone(*itr);
     assert(revPattern != 0);
@@ -413,54 +472,37 @@ AI::AI()
   jouseki.readJousekiFile();
 }
 
-void AI::search(Board &board, int depth, bool is_itr)
+void AI::search(Board &board, int depth)
 {
   MoveInfo info, newInfo;
   numSearchNode = 0;
 
   st.start = (int)clock();
-  // 反復深化
-  if(is_itr){
-    // 相手番で終わるようにしないと水平線効果でおかしな評価値になる
-    for(int i = 2; i <= depth; i += 2){
-      // 定石が24手までしかないからだっけ？
-      if(board.getTesuu() >= 25 || !jouseki.useJouseki(board)){
-	// 25手目以上ならば探索をする
-	// 定石が使えなければ探索をする
-	// 前の深さでの探索の結果をmove orderingに利用
-	// newInfo = negascout(board, turn, -INF, INF, i,
-	// 		   false, false, info.x, info.y);
-	newInfo = negascout(board, -INF, INF, i);
-			    // false, false, info.x, info.y);
-      }else{
-	// 25手目未満かつ定石が使えればreturn
-	// 定石が使えるのに反復深化しても意味ないよね
-	return;
-      }
-      if(((double)clock() - st.start) / (double)CLOCKS_PER_SEC >= st.searchTime){
-	// タイムオーバーならbreak
-	break;
-      }else{
-	// newInfoの内容をコミットする感じ
-	info = newInfo;
-	std::cout << "Iterative deepning : " << i << std::endl;
-      }
-    }
-    std::cout << "search node num : " << numSearchNode << std::endl;
-  }else{
-    // 反復深化を行わない場合(この場合一手あたりの制限時間を設けない)
+
+  // 相手番で終わるようにしないと水平線効果でおかしな評価値になる
+  for(int i = 2; i <= depth; i += 2){
+    // 定石が24手までしかないからだっけ？
     if(board.getTesuu() >= 25 || !jouseki.useJouseki(board)){
       // 25手目以上ならば探索をする
       // 定石が使えなければ探索をする
-      int tmpSt = st.searchTime;
-      st.searchTime = INF;
-      info = negascout(board, -INF, INF, depth);
-      st.searchTime = tmpSt;
+      // 前の深さでの探索の結果をmove orderingに利用
+      newInfo = negascout(board, -INF, INF, i);
     }else{
       // 25手目未満かつ定石が使えればreturn
+      // 定石が使えるのに反復深化しても意味ないよね
       return;
     }
+    if(((double)clock() - st.start) / (double)CLOCKS_PER_SEC >= st.searchTime){
+      // タイムオーバーならbreak
+      break;
+    }else{
+      // newInfoの内容をコミットする感じ
+      info = newInfo;
+      std::cout << "Iterative deepning : " << i << std::endl;
+    }
   }
+  std::cout << "search node num : " << numSearchNode << std::endl;
+  
   // 結果が確定していないnewInfoを使ってはいけない
   pair<int, int> coord = Board::posToXY(info.pos);
   std::cout << "x , y, score = " << coord.first + 1 << ", " << coord.second + 1 << ", "

@@ -553,7 +553,7 @@ double Pattern::evalFeature(const LightBoard &board) const
     // }
   }
 
-  return MAGNITUDE * (board.getTurn() == BLACK ? score : -score);
+  return (board.getTurn() == BLACK ? score : -score);
 }
 
 // 盤面に現れる特徴のインデックスを取得

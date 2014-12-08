@@ -26,6 +26,7 @@ const double DELTA = 0.000001;  //微小量
 /* const double SCALE = 1.5; */
 
 const int THRESH_MOVE_ORDERING_DEPTH = 4;
+const int HASH_REGISTER_DEPTH = 5;
 
 //ProbCutのマージン
 /* const double MARGIN3 = 7.47179 * SCALE; */
@@ -116,7 +117,9 @@ class AI
    * the child node which you can get by putting a stone on "pcx", "pcy".
    * This is available when "is_ordering" is false.
    */
-  MoveInfo negascout(Board &board, double alpha, double beta, int depth);
+  MoveInfo negascout(Board &board, double alpha, double beta, int depth,
+		     bool nullWindowSearch = false);
+  MoveInfo minimax(Board &board, int depth);
 		     /* bool isOrdering = true, bool isProb = true, */
 		     /* int pcx = 0, int pcy = 0); */
 
@@ -126,7 +129,7 @@ class AI
   /** This function is intended to be used in actual game play.
    * If "is_itr" is true, the iteretive deepning algorithm runs.
    */
-  void search(Board &board, int depth, bool is_itr = true);
+  void search(Board &board, int depth);
   /** This function calculates the leaf value.
    * If the winner is decided, this function adds
    * or describes 5000 points to the usual return value.

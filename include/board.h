@@ -96,7 +96,7 @@ class Board : public LightBoard
   bool isEnd() const;
   /** Check if the player whose turn is "turn" must pass or not. */
   bool isPass() const;
-  list<BitBoard>& getCl()
+  const list<BitBoard>& getCl()
     {
       return candList;
     }

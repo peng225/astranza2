@@ -477,6 +477,7 @@ void Board::backUpdateCandList(BitBoard pos)
   // displayCandListPos();
   assert(isValidPos(pos));  
 
+  assert(!candListDiffs.empty());
   pair<int, int> clDiff = candListDiffs.top();
   candListDiffs.pop();
   list<BitBoard>::iterator posItr = begin(candList);

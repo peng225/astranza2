@@ -11,8 +11,6 @@
 const int NUM_SIMPLE_SYMMETRY = 2;
 const int NUM_SYMMETRY = 4;
 
-const int MAGNITUDE = 1;
-
 // each feature's number
 const int MAX_P10 = 59049;
 const int MAX_P9 = 19683;

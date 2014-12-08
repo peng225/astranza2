@@ -27,7 +27,6 @@ int main(int argc, char *argv[])
 
   board.display();
 
-  // いつかここを直さないといけない
   if(argc >= 2 && argv[1][0] == 'b'){
     BitBoard pos;
     pos = Board::xyToPos(3, 2);
@@ -68,9 +67,15 @@ int main(int argc, char *argv[])
       loopNum = atoi(argv[2]);
     }
 
-    ai.setTime(INF);
+    ai.setTime(INF);        
     for(int i = 0; i < loopNum; i++){
-      ai.search(board, 8);
+      // Pattern pt;
+      // DetailedMoveInfo a = ai.detailedNegascout(board, -INF, INF, 4, pt);
+      MoveInfo a = ai.negascout(board, -INF, INF, 4);
+      MoveInfo b = ai.minimax(board, 4);
+      cout << "target : " << a.score << endl;
+      cout << "correct: " << b.score << endl;
+      ai.search(board, 6);
     }
     return 0;
   }
