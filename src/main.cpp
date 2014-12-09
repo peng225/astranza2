@@ -20,7 +20,7 @@ const int DEFAULT_DEPTH = 14;
 int main(int argc, char *argv[])
 {
   Board board;
-  AI ai;
+  AI ai, subAI;
   list<History> hist;
   int depth = DEFAULT_DEPTH;
 
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     cmdAndArgs.erase(begin(cmdAndArgs));
     if(command == "fight" || command == "f"){
       // fight(board, ai, *ist);
-      fight(board, ai, cmdAndArgs);
+      fight(board, ai, subAI, cmdAndArgs);
     }
     else if(command == "undo" || command == "u"){
       undo(board, hist);
@@ -137,7 +137,9 @@ int main(int argc, char *argv[])
       put(board, hist, cmdAndArgs);
     }
     else if(command == "display" || command == "d") board.display();
-    // else if(command == "load" || command == "ld") load(*ist);
+    else if(command == "load" || command == "ld"){
+      load(ai, subAI, cmdAndArgs);
+    }
     // else if(command == "help" || command == "h") help();
     else if(command == "kifu" || command == "k"){
       outputKifu(hist);
@@ -151,6 +153,7 @@ int main(int argc, char *argv[])
     }
     
     // delete ist;
+    cmdAndArgs.clear();
     add_history(line);
     if (++history_no > MAX_HISTORY_NUM) {
       history = remove_history(0);

@@ -15,12 +15,12 @@ size_t hash_value(const Board &board)
   return h;
 }
 
-//private member of Search
-//末端評価
+// private member of Search
+// 末端評価
 MoveInfo AI::eval(const Board &board)
 {
   MoveInfo info;
-  //勝敗が決まっていたら、max or minの評価値を返す
+  // 勝敗が決まっていたら、max or minの評価値を返す
   if(board.isEnd()){
     State_t winner = board.getWinner();
     if(winner == board.getTurn()){

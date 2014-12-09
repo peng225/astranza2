@@ -106,10 +106,10 @@ void search(Board &board, AI &ai, int depth, list<History> &hist)
   }
 }
 
-void fight(Board &board, AI &ai, const list<string> &args)
+void fight(Board &board, AI &ai, AI &subAI, const list<string> &args)
 {
-  if(args.size() < 1){
-    cerr << "The depth is required." << endl;
+  if(args.size() < 2){
+    cerr << "The depth and the AI type is required." << endl;
     return;
   }
   list<History> h;
@@ -118,8 +118,20 @@ void fight(Board &board, AI &ai, const list<string> &args)
   // ist >> depth;
   list<string>::const_iterator itr = begin(args);
   depth = atoi(itr->c_str());
+  itr++;
+  int type = atoi(itr->c_str());
+  if(type != MAIN_AI && type != SUB_AI){
+    cerr << "Invalid type." << endl;
+    return;
+  }
+  bool mainTurn = (type == MAIN_AI ? true : false);
   while(!board.isEnd()){
-    search(board, ai, depth, h);
+    if(mainTurn){
+      search(board, ai, depth, h);
+    }else{
+      search(board, subAI, depth, h);
+    }
+    mainTurn = !mainTurn;
   }
 }
 
@@ -166,4 +178,23 @@ void learn(const list<string> &args)
   list<string>::const_iterator itr = begin(args);
   string filename = *itr;
   ln.learn(filename);
+}
+
+void load(AI &ai, AI &subAI, const list<string> &args)
+{
+  if(args.size() < 2){
+    cerr << "AI type and weight file name is required." << endl;
+    return;
+  }
+  list<string>::const_iterator itr = begin(args);
+  int type = atoi(itr->c_str());
+  itr++;
+  if(type == MAIN_AI){
+    ai.loadWeight(*itr);
+  }else if(type == SUB_AI){
+    subAI.loadWeight(*itr);
+  }else{
+    cerr << "Invalid type." << endl;
+    return;
+  }
 }

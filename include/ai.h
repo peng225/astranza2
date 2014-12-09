@@ -136,6 +136,10 @@ class AI
    */
   MoveInfo eval(const Board &board);
   DetailedMoveInfo detailedEval(const LightBoard &board, const Pattern &lnPt);
+  void loadWeight(string filename)
+  {
+    pt.loadWeight(filename, false);
+  }
   
  private:
   Jouseki jouseki;
@@ -144,23 +148,3 @@ class AI
   BoardHash bh;
   int numSearchNode;
 };
-
-/** This class is used when you run the learning.
- */
-/* class Search2 : public Search */
-/* { */
-/*  public: */
-/*   /\** This function calculates the leaf value. */
-/*    * The difference between this functions and the counter part in the "Search" class */
-/*    * is whether the function adds the winner's bonus or not. */
-/*    *\/ */
-/*   MoveInfo eval(const spBan ban, int turn); */
-/*   /\** This function searches the game tree. */
-/*    * The difference between this functions and the counter part in the "Search" class */
-/*    * is whether the function uses the hash or not. */
-/*    *\/ */
-/*   MoveInfo sc_negamax(const spBan ban, int turn, double alpha, double beta, int depth, */
-/* 		   bool is_ordering = true, bool is_prob = true, */
-/* 		   int pcx = 0, int pcy = 0); */
-/* }; */
-

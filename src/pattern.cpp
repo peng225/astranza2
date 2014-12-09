@@ -13,7 +13,8 @@ Pattern::Pattern()
   std::ifstream ifs("weight");
   std::string line;
   if(!ifs){
-    std::cout << "There is no weight file. Initialize weight as 0." << std::endl;
+    std::cout << "There is no weight file. Initialize weight with 0."
+	      << std::endl;
     initWeight();
   }else{
     for(int i = 0; i < FEATURE_NUM; i++){
@@ -37,15 +38,16 @@ void Pattern::initWeight()
   weight[0] = 1;
 }
 
-void Pattern::loadWeight(std::string wName)
+void Pattern::loadWeight(std::string wName, bool errorInit)
 {
   std::ifstream ifs(wName.c_str());
   std::string line;
   if(!ifs){
-    std::cout << "There is no weight file named " + wName
-      + ". Initialize weight as 0." 
-	      << std::endl;
-    initWeight();
+    std::cout << "There is no weight file named " + wName + "." << endl;
+    if(errorInit){
+      cout << "Initialize weight as 0." << endl;
+      initWeight();
+    }
   }else{
     for(int i = 0; i < FEATURE_NUM; i++){
       getline(ifs, line);

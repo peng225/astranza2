@@ -6,7 +6,11 @@
 #include <fstream>
 #include <sstream>
 #include <math.h>
+#include <iostream>
 #include "board.h"
+
+using std::cout;
+using std::endl;
 
 const int NUM_SIMPLE_SYMMETRY = 2;
 const int NUM_SYMMETRY = 4;
@@ -42,7 +46,7 @@ class Pattern
  public:
   Pattern();
   void initWeight();
-  void loadWeight(std::string wName);
+  void loadWeight(std::string wName, bool errorInit = true);
   double evalFeature(const LightBoard &board) const;
   void setWeight(int i, double val)
   {
