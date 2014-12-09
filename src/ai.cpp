@@ -11,6 +11,7 @@ size_t hash_value(const Board &board)
   size_t h = 0;
   boost::hash_combine(h, board.getBlack());
   boost::hash_combine(h, board.getWhite());
+  boost::hash_combine(h, board.getTurn());
   return h;
 }
 
@@ -156,12 +157,30 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
       availPos.push_back(*itr);      
     }
   }
+
+  // デバッグ用
+  // if(depth == 8){
+  //   for(list<BitBoard>::iterator itr = begin(availPos);
+  // 	itr != end(availPos); itr++){
+  //     BitBoard revPattern;
+  //     revPattern = board.putStone(*itr);
+  //     assert(revPattern != 0);
+  //     info = negascout(board, -beta, -alpha, depth - 1, true);
+  //     info.score *= -1;
+  //     cout << Board::posToXY(*itr).first + 1 << ", "
+  // 	   << Board::posToXY(*itr).second + 1 << ", "
+  // 	   << info.score << endl;
+  //     board.undo(*itr, revPattern);
+  //   }
+  // }
+  // ここまで
   
   // 置く場所がなかったらパス
   if(availPos.size() == 0){
     assert(board.isPass());
+    // cout << "pass" << endl;
     board.changeTurn();
-    info = negascout(board, -beta, -alpha, depth - 1); 
+    info = negascout(board, -beta, -alpha, depth - 1, nullWindowSearch); 
     info.score *= -1;
     // ここでもう一度turnを変えないと、呼び出し元でのturnがおかしくなる
     board.changeTurn();
@@ -207,7 +226,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
       revPattern = board.putStone(*i);
       assert(revPattern != 0);
       // 浅い探索
-      moInfo = negascout(board, -beta, -alpha, 1);
+      moInfo = negascout(board, -beta, -alpha, 1, nullWindowSearch);
       /*
 	ここではscoreに-1をかけない。
 	後でmapのキーでソートを行うが、
@@ -225,7 +244,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
       availPos.push_back(i->second);
       // cout << i->first << ": " << i->second.first+1 << ", "
       // 	   << i->second.second+1 << endl;
-    }
+    }    
   }  
   
   // first child
@@ -234,7 +253,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
 
   revPattern = board.putStone(availPos.front());
   assert(revPattern != 0);
-  info = negascout(board, -beta, -alpha, depth - 1);
+  info = negascout(board, -beta, -alpha, depth - 1, nullWindowSearch);
   info.score *= -1;
   /*
     手を打つ度に盤面オブジェクトを作るのは非常にコストがかかるので、
@@ -258,16 +277,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
 
   
   for(list<BitBoard>::const_iterator itr = next(begin(availPos));
-      itr != end(availPos); itr++){
-    // // Put a stone on the child node.
-    // revPattern = board.putStone(itr->first, itr->second);
-    // assert(revPattern != 0);
-    // info = negascout(board, -beta, -alpha, depth - 1);
-    // info.score *= -1;
-    // board.undo(itr->first, itr->second, revPattern);
-
-    
-
+      itr != end(availPos); itr++){    
     // Null Window Search
     revPattern = board.putStone(*itr);
     assert(revPattern != 0);
@@ -282,7 +292,7 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
       return info;
     }else if(alpha < info.score){
       alpha = info.score;
-      info = negascout(board, -beta, -alpha, depth - 1);
+      info = negascout(board, -beta, -alpha, depth - 1, nullWindowSearch);
       info.score *= -1;
       if(beta <= info.score){
 	// cout << "real beta cut" << endl;
@@ -488,6 +498,7 @@ BitBoard AI::search(Board &board, int depth)
       // 定石が使えなければ探索をする
       // 前の深さでの探索の結果をmove orderingに利用
       newInfo = negascout(board, -INF, INF, i);
+      // newInfo = minimax(board, i);
     }else{
       // 25手目未満かつ定石が使えればreturn
       // 定石が使えるのに反復深化しても意味ないよね
