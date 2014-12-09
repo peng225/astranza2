@@ -109,7 +109,8 @@ void search(Board &board, AI &ai, int depth, list<History> &hist)
 void fight(Board &board, AI &ai, AI &subAI, const list<string> &args)
 {
   if(args.size() < 2){
-    cerr << "The depth and the AI type is required." << endl;
+    cerr << "The depth and the number of fight is required."
+	 << endl;
     return;
   }
   list<History> h;
@@ -119,20 +120,43 @@ void fight(Board &board, AI &ai, AI &subAI, const list<string> &args)
   list<string>::const_iterator itr = begin(args);
   depth = atoi(itr->c_str());
   itr++;
-  int type = atoi(itr->c_str());
-  if(type != MAIN_AI && type != SUB_AI){
-    cerr << "Invalid type." << endl;
-    return;
-  }
-  bool mainTurn = (type == MAIN_AI ? true : false);
-  while(!board.isEnd()){
-    if(mainTurn){
-      search(board, ai, depth, h);
-    }else{
-      search(board, subAI, depth, h);
+  
+  int numFight = atoi(itr->c_str());
+  
+  bool mainTurn, mainFirst;
+  int numMainWin = 0, numSubWin = 0;
+  for(int i = 0; i < numFight; i++){
+    mainTurn = (i % 2 == 0 ? true : false);
+    mainFirst = mainTurn;
+    while(!board.isEnd()){
+      if(mainTurn){
+	search(board, ai, depth, h);
+      }else{
+	search(board, subAI, depth, h);
+      }
+      mainTurn = !mainTurn;
     }
-    mainTurn = !mainTurn;
+    if(board.getWinner() == BLACK){
+      if(mainFirst){
+	numMainWin++;
+      }else{
+	numSubWin++;
+      }
+    }else if(board.getWinner() == WHITE){
+      if(mainFirst){
+	numSubWin++;
+      }else{
+	numMainWin++;
+      }
+    }
+    board.init();
+    ai.init();
+    subAI.init();    
   }
+  cout << numFight << " times fight." << endl;
+  cout << "Main wins: " << numMainWin << endl;
+  cout << "Sub wins: " << numSubWin << endl;
+  cout << "Draw: " << numFight - numMainWin - numSubWin << endl;
 }
 
 void undo(Board &board, list<History> &hist)
