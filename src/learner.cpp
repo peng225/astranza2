@@ -12,22 +12,22 @@ void Learner::loadKifu()
 {
   std::ifstream ifs;
   std::string line;
-  char f_name[32];
+  char filename[MAX_FILENAME];
   bool kifu_kind = 0;
   int offset_self = 0;
 
   for(int i = 0; i < LOAD_KIFU_NUM; i++){
     if(kifu_kind == 0){
-      sprintf(f_name, "kifu/pro/kifu%d", i);
-      ifs.open(f_name);
+      sprintf(filename, "kifu/pro/kifu%d", i);
+      ifs.open(filename);
       if(!ifs){
 	kifu_kind = 1;
 	offset_self = i;
       }
     }
     if(kifu_kind == 1){
-      sprintf(f_name, "kifu/edax/kifu%d", i - offset_self);
-      ifs.open(f_name);
+      sprintf(filename, "kifu/edax/kifu%d", i - offset_self);
+      ifs.open(filename);
       if(!ifs){
 	std::cerr << "Too few training data!" << std::endl;
 	exit(1);
@@ -46,34 +46,32 @@ void Learner::loadKifu()
       tx--;
       ty--;
       BitBoard pos = Board::xyToPos(tx, ty);
-      //最初の数手はいらない
+      // 最初の数手はいらない
       if(count < THRESH_NUM_CUTOFF_MOVE){
-	//banを一手ずつ進めていく
+	// boardを一手ずつ進めていく
 	board.putStone(pos, true);
 	count++;
 	continue;
       }
-      //実体を作る
+      // 実体を作る
       Board tboard = board;
-      std::cout << f_name << std::endl;
+      std::cout << filename << std::endl;
       tboard.display();
-      // tboard.set_turn(turn);
-      //正解の指し手を保存していく
-      // tboard.set_correct(tx, ty);
+      // 正解の指し手を保存していく
       kyokumen.push_back(CorrectMove(tboard, tboard.getCl(), pos));
-      //banを一手ずつ進めていく
-      //パスなら手順を入れ替えてやり直し
+      // boardを一手ずつ進めていく
+      // パスなら手順を入れ替えてやり直し
       if(!board.putStone(pos, true)){
-	assert(board.isEnd());
+	// assert(board.isEnd());
 	kyokumen.pop_back();
       }
     }
-    //最後の局面は手が決まってしまっており、学習に利用できないので破棄
+    // 最後の局面は手が決まってしまっており、学習に利用できないので破棄
     kyokumen.pop_back();
     ifs.close();
   }
   
-  //randomize
+  // randomize
   Random rnd;
   random_shuffle(kyokumen.begin(), kyokumen.end(), rnd);
 
@@ -81,7 +79,7 @@ void Learner::loadKifu()
   std::cout << "Loaded kyokumen num:" << kyokumen.size() << std::endl;
 }
 
-//Bonanza method
+// Bonanza method
 void Learner::learn(std::string filename, bool verbose)
 {
   list<int> cvalidIndices, ovalidIndices;  //特徴ベクトルが0ではないindices
@@ -248,6 +246,7 @@ void Learner::learn(std::string filename, bool verbose)
       double w = pt.getWeight(i);
       pt.setWeight(i, w - LEARNING_RATE * GAMMA * 2 * w);
     }
+    cout << "L2 regularization done." << endl;
   }
   std::cout << "Learning complete!" << std::endl;
   //ファイル書き出し

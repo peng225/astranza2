@@ -15,6 +15,7 @@ const int REPEAT_NUM = 2;
 const double ACCURACY = 0.327;
 
 const int THRESH_NUM_CUTOFF_MOVE = 4;
+const int MAX_FILENAME = 32;
 
 using std::vector;
 using std::list;

@@ -18,7 +18,12 @@ void printWinner(const Board &board)
   }
 }
 
-void put(Board &board, list<History> &hist, std::istream &ist){  
+void put(Board &board, list<History> &hist, const list<string> &args){
+  if(args.size() < 2){
+    cerr << "x and y value is required." << endl;
+    return;
+  }
+  
   int x = 0, y = 0;
   bool putSuccess = true;
   if(board.getTurn() == BLACK){
@@ -26,7 +31,11 @@ void put(Board &board, list<History> &hist, std::istream &ist){
   }else{
     cout << "Turn:WHITE" << endl;
   }
-  ist >> x >> y;
+  // ist >> x >> y;
+  list<string>::const_iterator itr = begin(args);
+  x = atoi(itr->c_str());
+  itr++;
+  y = atoi(itr->c_str());
 
   // 人間視点の座標をコンピュータ視点へ変換
   x--;
@@ -97,12 +106,18 @@ void search(Board &board, AI &ai, int depth, list<History> &hist)
   }
 }
 
-void fight(Board &board, AI &ai, std::istream &ist)
+void fight(Board &board, AI &ai, const list<string> &args)
 {
+  if(args.size() < 1){
+    cerr << "The depth is required." << endl;
+    return;
+  }
   list<History> h;
   int depth;
 
-  ist >> depth;
+  // ist >> depth;
+  list<string>::const_iterator itr = begin(args);
+  depth = atoi(itr->c_str());
   while(!board.isEnd()){
     search(board, ai, depth, h);
   }
@@ -139,4 +154,16 @@ void outputKifu(list<History> &hist)
 	<< Board::posToXY(itr->getPos()).second + 1
 	<< endl;
   }
+}
+
+void learn(const list<string> &args)
+{
+  if(args.size() < 1){
+    cerr << "The output file name is required." << endl;
+    return;
+  }
+  Learner ln;
+  list<string>::const_iterator itr = begin(args);
+  string filename = *itr;
+  ln.learn(filename);
 }
