@@ -59,6 +59,7 @@ void Learner::loadKifu()
       tboard.display();
       // 正解の指し手を保存していく
       kyokumen.push_back(CorrectMove(tboard, tboard.getCl(), pos));
+      // kyokumen.push_back(CorrectMove(tboard, pos));
       // boardを一手ずつ進めていく
       // パスなら手順を入れ替えてやり直し
       if(!board.putStone(pos, true)){
@@ -76,7 +77,7 @@ void Learner::loadKifu()
   random_shuffle(kyokumen.begin(), kyokumen.end(), rnd);
 
   std::cout << "Learning data randomized!" << std::endl;
-  std::cout << "Loaded kyokumen num:" << kyokumen.size() << std::endl;
+  std::cout << "Loaded kyokumen num: " << kyokumen.size() << std::endl;
 }
 
 // Bonanza method
@@ -96,50 +97,57 @@ void Learner::learn(std::string filename, bool verbose)
   for(int h = 0; h < REPEAT_NUM; h++){
     for(vector<CorrectMove>::iterator i = begin(kyokumen);
 	i != end(kyokumen); i++){
-      std::cout << "repeat:" << h << ", kyokumen:"
+      std::cout << "repeat: " << h << ", kyokumen: "
 		<< distance(begin(kyokumen), i) << std::endl;
       
       if(verbose){
 	i->board.display();
       }
-      int turn = i->board.getTurn();
+
+      // int turn = i->board.getTurn();
       BitBoard cpos = i->correctPos;
-      std::string tlabel = (turn == BLACK ? "BLACK" : "WHITE");
+      std::string tlabel = (i->board.getTurn() == BLACK ? "BLACK" : "WHITE");
       if(verbose){
-	std::cout << "turn:" << tlabel << std::endl;
+	std::cout << "turn: " << tlabel << std::endl;
 	pair<int, int> coord = Board::posToXY(cpos);
-	std::cout << "correct pos:" << coord.first << ", "
-		  << coord.second << std::endl;
+	std::cout << "correct pos: " << coord.first + 1 << ", "
+		  << coord.second + 1 << std::endl;
       }
+      
       BitBoard revPattern;
       revPattern = i->board.putStone(cpos);      
       //棋譜の手から深さ3or5の探索を行った局面の評価値を取得する
       DetailedMoveInfo cv;  //棋譜の手、評価値、末端局面を保持する
       cv = ai.detailedNegascout(i->board, -INF, INF,
-				h < (REPEAT_NUM >> 1) ? 3 : 5, pt);
+				h < (REPEAT_NUM >> 1) ? SHALLOW : DEEP, pt);
       cv.score *= -1;
       cv.pos = cpos;
       i->board.undo(cpos, revPattern);
       // double cmbsValue = -sc.eval(cv.ban, -turn).value;      
       if(verbose){
 	// double cmbsValue = ai.detailedEval(cv.board, pt).score;
-	std::cout << "correct value:" << cv.score << std::endl;
+	std::cout << "correct value: " << cv.score << std::endl;
 	// std::cout << "must be same:" << cmbsValue << std::endl;
 	// assert(cv.score == cmbsValue || cv.score == -cmbsValue);
 
-	std::cout << "correct terminal situation:" << std::endl;
+	std::cout << "correct terminal situation: " << std::endl;
 	cv.board.display();
       }
+      
       //棋譜の手から探索を行った末端局面の特徴ベクトルを抽出
       cvalidIndices.clear();
-      // bkCvalidIndices.clear();
       pt.extractFeatureIndices(cv.board, cvalidIndices);
-      // bkCvalidIndices.assign(cvalidIndices.begin(), cvalidIndices.end());
       
+      // for(list<BitBoard>::const_iterator j = begin(i->board.getCl());
+      // 	  j != end(i->board.getCl()); j++){            
+      /*
+	i->board.getCl()を直接呼ぶことはできない。
+	board内のcandListはputStoneやundoによって内部的に変化しており、
+	イテレータが不正な値を指すことになるから。
+      */
       for(list<BitBoard>::const_iterator j = begin(i->candList);
-	  j != end(i->candList); j++){
+      	  j != end(i->candList); j++){
 	//棋譜の手なら飛ばす
-	// if(cv.x == j->first && cv.y == j->second){
 	if(cv.pos == *j){
 	  continue;
 	}
@@ -148,19 +156,19 @@ void Learner::learn(std::string filename, bool verbose)
 	  revPattern = i->board.putStone(*j);
 	  if(verbose){
 	    pair<int, int> coord = Board::posToXY(*j);
-	    std::cout << "other pos:" << coord.first << ", "
-		      << coord.second << std::endl;
+	    std::cout << "other pos: " << coord.first + 1 << ", "
+		      << coord.second + 1 << std::endl;
 	  }
-	  //ここから深さ５の探索を行う
+	  //ここから深さ3or5の探索を行う
 	  DetailedMoveInfo ov;  //棋譜の手以外の情報を保持する
 	  ov = ai.detailedNegascout(i->board, -INF, INF,
-				    h < (REPEAT_NUM >> 1) ? 3 : 5, pt);
+				    h < (REPEAT_NUM >> 1) ? SHALLOW : DEEP, pt);
 	  ov.score *= -1;
 	  ov.pos = *j;
 	  i->board.undo(*j, revPattern);
 	  if(verbose){
 	    // double ombsValue = ai.detailedEval(ov.board, pt).score;
-	    std::cout << "other value:" << ov.score << std::endl;
+	    std::cout << "other value: " << ov.score << std::endl;
 	    // std::cout << "must be same:" << ombsValue << std::endl;
 	    // assert(ov.score == ombsValue || ov.score == -ombsValue);
 	  }
@@ -202,7 +210,7 @@ void Learner::learn(std::string filename, bool verbose)
 	      const double cw = pt.getWeight(*itr);
 	      //黒なら重みを大きくし、白なら小さくする
 	      assert((1 + logistic) * (1 + logistic) != 0);	    
-	      if(turn == BLACK){
+	      if(i->board.getTurn() == BLACK){
 		pt.setWeight(*itr, cw + LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)));
 	      }else{
 		pt.setWeight(*itr, cw - LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)));
@@ -217,7 +225,7 @@ void Learner::learn(std::string filename, bool verbose)
 	      const double ow = pt.getWeight(*itr);
 	      //黒なら重みを小さくし、白なら大きくする
 	      assert((1 + logistic) * (1 + logistic) != 0);
-	      if(turn == BLACK){		    
+	      if(i->board.getTurn() == BLACK){		    
 		pt.setWeight(*itr, ow - LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic))); //pow(1 + logistic, 2));
 	      }else{
 		pt.setWeight(*itr, ow + LEARNING_RATE * ACCURACY * logistic / ((1 + logistic) * (1 + logistic)));
@@ -227,8 +235,8 @@ void Learner::learn(std::string filename, bool verbose)
 	    }
 	    cv.score = ai.detailedEval(cv.board, pt).score;
 	    if(verbose){
-	      std::cout << "new correct value:" << cv.score  << std::endl;
-	      std::cout << "new other value:"
+	      std::cout << "new correct value: " << cv.score  << std::endl;
+	      std::cout << "new other value: "
 			<< ai.detailedEval(ov.board, pt).score << std::endl;
 	      std::cout << std::endl;
 	    }
@@ -241,15 +249,20 @@ void Learner::learn(std::string filename, bool verbose)
       }
     }
 
-    //L2正則化
+    // L2正則化
     for(int i = 0; i < FEATURE_NUM; i++){
       double w = pt.getWeight(i);
       pt.setWeight(i, w - LEARNING_RATE * GAMMA * 2 * w);
     }
     cout << "L2 regularization done." << endl;
+
+    // randomize
+    Random rnd;
+    random_shuffle(kyokumen.begin(), kyokumen.end(), rnd);
+    std::cout << "Learning data randomized!" << std::endl;
   }
   std::cout << "Learning complete!" << std::endl;
-  //ファイル書き出し
+  // ファイル書き出し
   std::ofstream ofs;
   ofs.open(filename.c_str());
   for(int i = 0; i < FEATURE_NUM; i++){

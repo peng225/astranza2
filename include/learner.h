@@ -6,16 +6,27 @@
 #include "pattern.h"
 #include "ai.h"
 
-const double LEARNING_RATE = 0.207;
-const double GAMMA = 0.0717;
+/* const double LEARNING_RATE = 0.207; */
+/* const double GAMMA = 0.0717; */
+/* const double ACCURACY = 0.327; */
+
+const double LEARNING_RATE = 0.635;
+const double GAMMA = 1.877;
+const double ACCURACY = 1.999;
+
 /* const int LOAD_KIFU_NUM = 260; */
-const int LOAD_KIFU_NUM = 1;
+/* const int LOAD_KIFU_NUM = 1; */
+const int LOAD_KIFU_NUM = 50;
+
 /* const int REPEAT_NUM = 10; */
+/* const int REPEAT_NUM = 2; */
 const int REPEAT_NUM = 2;
-const double ACCURACY = 0.327;
 
 const int THRESH_NUM_CUTOFF_MOVE = 4;
 const int MAX_FILENAME = 32;
+
+const int SHALLOW = 3;
+const int DEEP = 5;
 
 using std::vector;
 using std::list;
@@ -31,14 +42,11 @@ struct CorrectMove
     this->board = board;
     this->candList = candList;
     correctPos = pos;
-    /* correctPos.first = x; */
-    /* correctPos.second = y; */
   }
   
   Board board;
   list<BitBoard> candList;
   BitBoard correctPos;
-  /* pair<int, int> correctPos; */
 };
 
 class Learner

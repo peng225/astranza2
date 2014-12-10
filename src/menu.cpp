@@ -195,13 +195,21 @@ void outputKifu(list<History> &hist)
 void learn(const list<string> &args)
 {
   if(args.size() < 1){
-    cerr << "The output file name is required." << endl;
+    cerr << "The output file name (and verbose flag) is required." << endl;
     return;
   }
   Learner ln;
-  list<string>::const_iterator itr = begin(args);
+  list<string>::const_iterator itr = begin(args);  
   string filename = *itr;
-  ln.learn(filename);
+  itr++;
+
+  if(args.size() == 1){
+    ln.learn(filename);
+  }else if(atoi(itr->c_str()) == LEARN_VERVOSE){
+    ln.learn(filename, true);
+  }else{
+    cerr << "Invalid verbose flag." << endl;
+  }
 }
 
 void load(AI &ai, AI &subAI, const list<string> &args)

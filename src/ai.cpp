@@ -337,7 +337,8 @@ MoveInfo AI::negascout(Board &board, double alpha, double beta, int depth,
 }
 
 // 学習時に使用
-DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta, int depth, const Pattern &lnPt)
+DetailedMoveInfo AI::detailedNegascout(Board &board, double alpha, double beta,
+				       int depth, const Pattern &lnPt)
 {
   DetailedMoveInfo info; 
   

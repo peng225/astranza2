@@ -18,6 +18,8 @@ using std::string;
 const int MAIN_AI = 0;
 const int SUB_AI = 1;
 
+const int LEARN_VERVOSE = 1;
+
 extern void put(Board &board, list<History> &hist, const list<string> &args);
 extern void search(Board &board, AI &ai, int depth, list<History> &hist);
 extern void fight(Board &board, AI &ai, AI &subAI, const list<string> &args);
