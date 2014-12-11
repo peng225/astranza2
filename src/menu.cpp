@@ -74,14 +74,17 @@ void put(Board &board, list<History> &hist, const list<string> &args){
   // board.display();  
 }
 
-void search(Board &board, AI &ai, int depth, list<History> &hist)
+void search(Board &board, AI &ai, int depth, list<History> &hist,
+	    bool verbose)
 {
   Board oldBoard = board;  
 
-  if(board.getTurn() == BLACK){
-    std::cout << "Turn:BLACK" << std::endl;
-  }else{
-    std::cout << "Turn:WHITE" << std::endl;
+  if(verbose){
+    if(board.getTurn() == BLACK){
+      std::cout << "Turn:BLACK" << std::endl;
+    }else{
+      std::cout << "Turn:WHITE" << std::endl;
+    }
   }
   
   if(!board.isEnd()){
@@ -89,20 +92,26 @@ void search(Board &board, AI &ai, int depth, list<History> &hist)
     pos = ai.search(board, depth);
     assert(Board::isValidPos(pos));
     hist.push_back(History(oldBoard, pos));
-    board.display();
+    if(verbose){
+      board.display();
+    }
 
     // 終了処理
     if(board.isEnd()){
-      printWinner(board);
+      if(verbose){
+	printWinner(board);
+      }
       return;
     }
 
     // パスの処理
     if(board.isPass()){
-      cout << (board.getTurn() == BLACK ? "BLACK" : "WHITE") << " PASS" << endl;
+      if(verbose){
+	cout << (board.getTurn() == BLACK ? "BLACK" : "WHITE")
+	     << " PASS" << endl;
+      }
       board.changeTurn();
-    }
-        
+    }        
   }
 }
 
@@ -126,13 +135,14 @@ void fight(Board &board, AI &ai, AI &subAI, const list<string> &args)
   bool mainTurn, mainFirst;
   int numMainWin = 0, numSubWin = 0;
   for(int i = 0; i < numFight; i++){
+    cout << "fight: " << i << endl;
     mainTurn = (i % 2 == 0 ? true : false);
     mainFirst = mainTurn;
     while(!board.isEnd()){
       if(mainTurn){
-	search(board, ai, depth, h);
+	search(board, ai, depth, h, false);
       }else{
-	search(board, subAI, depth, h);
+	search(board, subAI, depth, h, false);
       }
       mainTurn = !mainTurn;
     }
@@ -151,12 +161,15 @@ void fight(Board &board, AI &ai, AI &subAI, const list<string> &args)
     }
     board.init();
     ai.init();
-    subAI.init();    
+    subAI.init();
+    h.clear();
   }
   cout << numFight << " times fight." << endl;
   cout << "Main wins: " << numMainWin << endl;
   cout << "Sub wins: " << numSubWin << endl;
   cout << "Draw: " << numFight - numMainWin - numSubWin << endl;
+  cout << "Main winning rate: "
+       << (double)numMainWin / (double)(numMainWin + numSubWin) << endl;
 }
 
 void undo(Board &board, list<History> &hist)

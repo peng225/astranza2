@@ -21,7 +21,8 @@ const int SUB_AI = 1;
 const int LEARN_VERVOSE = 1;
 
 extern void put(Board &board, list<History> &hist, const list<string> &args);
-extern void search(Board &board, AI &ai, int depth, list<History> &hist);
+extern void search(Board &board, AI &ai, int depth, list<History> &hist,
+		   bool verbose = true);
 extern void fight(Board &board, AI &ai, AI &subAI, const list<string> &args);
 extern void undo(Board &board, list<History> &hist);
 extern void outputKifu(list<History> &hist);

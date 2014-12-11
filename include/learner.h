@@ -10,17 +10,15 @@
 /* const double GAMMA = 0.0717; */
 /* const double ACCURACY = 0.327; */
 
-const double LEARNING_RATE = 0.635;
-const double GAMMA = 1.877;
-const double ACCURACY = 1.999;
+const double LEARNING_RATE = 1.388;
+const double GAMMA = 1.437;
+const double ACCURACY = 0.899;
 
-/* const int LOAD_KIFU_NUM = 260; */
+const int LOAD_KIFU_NUM = 260;
 /* const int LOAD_KIFU_NUM = 1; */
-const int LOAD_KIFU_NUM = 50;
 
-/* const int REPEAT_NUM = 10; */
+const int REPEAT_NUM = 10;
 /* const int REPEAT_NUM = 2; */
-const int REPEAT_NUM = 2;
 
 const int THRESH_NUM_CUTOFF_MOVE = 4;
 const int MAX_FILENAME = 32;
